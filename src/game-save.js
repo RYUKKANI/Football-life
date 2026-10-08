@@ -2,6 +2,11 @@
 // Validate portable backups before they reach the live save. No code or HTML is evaluated.
 const FootballSave=(()=>{
  const fail=()=>{throw Error('축구 생활의 기록 파일을 선택해 주세요.');};
+ const award=a=>{
+  if(!a||typeof a.name!=='string'||a.name.length>100||typeof a.player!=='string'||typeof a.club!=='string')fail();
+  if(a.pos!==undefined&&!Object.hasOwn(FootballEngine.POS,a.pos))fail();
+  if(a.stats){for(const [key,value]of Object.entries(a.stats))if(key==='saveRate'&&value===null)continue;else if(!Number.isFinite(value)||value<0||value>1000000)fail();if(a.stats.rating>10||a.stats.saveRate>100)fail();}
+ };
  const record=g=>{
   if(!g||typeof g!=='object'||!g.player||typeof g.player.name!=='string'||!Array.isArray(g.history))fail();
   if(g.player.name.length>80||g.history.length>300)fail();
@@ -33,7 +38,15 @@ const FootballSave=(()=>{
     if(!E.canRepresent(g,c.country)||g.phase==='callup'&&(c.accepted!==false||c.complete||c.matches.length)||g.phase==='international'&&c.accepted!==true)fail();
    }
    try{FootballExpansion.validate(g);}catch{fail();}
-   for(const r of [...g.history,g.period])if(!Array.isArray(r.matches)||r.matches.length>300)fail();
+   for(const r of [...g.history,g.period]){
+    if(!Array.isArray(r.matches)||r.matches.length>300)fail();
+    if(r.awardSeasons!==undefined){
+     if(!Array.isArray(r.awardSeasons)||r.awardSeasons.length>6)fail();
+     for(const s of r.awardSeasons){if(!s||typeof s.id!=='string'||typeof s.season!=='string'||!Object.hasOwn(E.LEAGUES,s.country)||!Array.isArray(s.awards)||s.awards.length>1000)fail();s.awards.forEach(award);}
+    }
+   }
+   // Older honours did not store the full performance snapshot.
+   g.awards.filter(a=>a.stats).forEach(award);
   }else if(g.version!==1)fail();
   return g;
  };

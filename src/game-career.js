@@ -236,7 +236,7 @@ const FootballCareer=(()=>{
    let remaining=Math.max(0,goals-(own?frame.goals:0)),assistBudget=Math.max(0,goals-(own?frame.assists:0));
    for(let i=0;i<remaining;i++){const scorer=pickField();if(scorer)scorer.goals++;if(assistBudget&&E.rand(r)<.72){const helper=pickField(scorer?.p.id);if(helper){helper.assists++;assistBudget--;}}}
    if(own&&frame.goals&&assistBudget&&E.rand(r)<.72){const helper=pickField();if(helper){helper.assists++;assistBudget--;}}
-   const totalFaced=frame?(home?f.h===userClub?frame.opponentOnTarget:frame.teamOnTarget:f.a===userClub?frame.opponentOnTarget:frame.teamOnTarget):conceded+E.int(r,1,7);
+   const totalFaced=(home?f.awayOnTarget:f.homeOnTarget)??(frame?(own?frame.opponentOnTarget:frame.teamOnTarget):conceded+E.int(r,1,7));
    for(const a of active){
     if(!a.minutes)continue;const p=a.p,time=a.minutes/90;p.apps++;p.starts++;p.minutes+=a.minutes;p.goals+=a.goals;p.assists+=a.assists;
     const passes=Math.round(time*({GK:22,CB:36,FB:44,MF:58,WG:34,ST:24}[p.pos])),completed=Math.round(passes*clamp(.52+p.ovr*.004,.60,.96));
@@ -244,9 +244,10 @@ const FootballCareer=(()=>{
     const kp=p.pos==='MF'||p.pos==='WG'?Math.round(E.rand(r)*time*3):0;p.keyPasses+=Math.max(kp,a.assists);
     const tackles=['CB','FB','MF'].includes(p.pos)?Math.round(time*(.6+E.rand(r)*3)*p.ovr/70):0,intercepts=['CB','FB','MF'].includes(p.pos)?Math.round(time*E.rand(r)*3*p.ovr/70):0;
     p.tackles+=tackles;p.interceptions+=intercepts;if(a.minutes>=60&&!conceded)p.clean++;
-    let rating=6.1+normal(r,-.35,.5)+a.goals*.82+a.assists*.52+kp*.07+tackles*.06+intercepts*.06+(goals>conceded?.12:-.05);
-    if(p.pos==='GK'){const ownKeeper=own&&g.player.pos==='GK';const faced=Math.max(0,totalFaced-(ownKeeper?frame.facedOnTarget:0)),allowed=Math.max(0,conceded-(ownKeeper?frame.conceded:0)),saves=Math.max(0,faced-allowed);p.saves+=saves;p.conceded+=allowed;p.facedOnTarget=(p.facedOnTarget||0)+faced;rating=6.2+saves*.14-allowed*.4+(!allowed?.4:0);}
-    p.ratingSum+=round(clamp(rating,3,10));
+    const performance={minutes:a.minutes,goals:a.goals,assists:a.assists,keyPasses:Math.max(kp,a.assists),passes,completed,tackles,interceptions:intercepts,clean:a.minutes>=60&&!conceded?1:0,own:goals,opp:conceded};
+    if(p.pos==='GK'){const ownKeeper=own&&g.player.pos==='GK';const faced=Math.max(0,totalFaced-(ownKeeper?frame.facedOnTarget:0)),allowed=Math.max(0,conceded-(ownKeeper?frame.conceded:0)),saves=Math.max(0,faced-allowed),claims=Math.round(time*E.rand(r)*3);p.saves+=saves;p.conceded+=allowed;p.claims+=claims;p.facedOnTarget=(p.facedOnTarget||0)+faced;Object.assign(performance,{saves,conceded:allowed,facedOnTarget:faced,claims});}
+    else {const dribbles=Math.round(time*E.rand(r)*({ST:1.5,WG:3,MF:1.5,CB:.3,FB:1.2}[p.pos]));p.dribbles+=dribbles;performance.dribbles=dribbles;}
+    p.ratingSum+=E.matchRating(p.pos,performance,normal(r,-.225,.225));
    }
   }
  }
@@ -262,22 +263,47 @@ const FootballCareer=(()=>{
   return [...w.players.map(p=>({...p,rating:p.apps?round(p.ratingSum/p.apps):0})),{...own,id:'USER-'+g.id,name:g.player.name,pos:g.player.pos,clubId:ownRows.at(-1)?.clubId||g.clubId,club:ownRows.at(-1)?.club||E.teamName(g),ovr:E.overall(g.player),mine:true,facedOnTarget:ownRows.reduce((s,m)=>s+(m.facedOnTarget||0),0)}];
  }
  function rankings(g,metric='goals',world=null){
-  const w=world||E.seasonWorld(g,g.country,'pro'),rows=leagueRows(g,w),played=Math.max(0,...w.table.map(t=>t.p)),minimum=Math.min(900,Math.max(90,Math.floor(played*90*.30))),rate=['rating','saveRate'].includes(metric);
+  const w=world||E.seasonWorld(g,g.country,'pro'),rows=leagueRows(g,w),played=Math.max(0,...w.table.map(t=>t.p)),minimum=Math.max(90,Math.ceil(played*90*.40)),rate=['rating','saveRate'].includes(metric);
   let list=rows.filter(p=>p.minutes>0&&(!['saves','clean','saveRate'].includes(metric)||p.pos==='GK'));
-  const value=p=>metric==='saveRate'?(p.facedOnTarget?p.saves/p.facedOnTarget*100:0):p[metric]||0;
+  const value=p=>metric==='saveRate'?(p.facedOnTarget?p.saves/p.facedOnTarget*100:0):metric==='rating'?(p.apps?p.ratingSum/p.apps:0):p[metric]||0;
   if(rate)list=list.filter(p=>p.minutes>=minimum&&(metric!=='saveRate'||p.facedOnTarget>=Math.min(30,Math.max(6,played))));
   list.sort((a,b)=>value(b)-value(a)||b.minutes-a.minutes||a.id.localeCompare(b.id));
-  let last=null,rank=0;list=list.map((p,i)=>{const v=round(value(p));if(v!==last)rank=i+1;last=v;return {...p,value:v,rank};});
+  const display=v=>Number(v.toFixed(rate?2:0));
+  let last=null,rank=0;list=list.map((p,i)=>{const v=value(p);if(last===null||Math.abs(v-last)>1e-10)rank=i+1;last=v;return {...p,value:display(v),rank};});
   const mine=list.find(p=>p.mine),own=rows.find(p=>p.mine);
-  return {metric,worldId:w.id,season:E.leagueLabel(w),country:w.country,minimum,rows:list,mine:mine||{...own,value:round(value(own)),rank:null},complete:w.complete};
+  return {metric,worldId:w.id,season:E.leagueLabel(w),country:w.country,minimum,rows:list,mine:mine||{...own,value:display(value(own)),rank:null},complete:w.complete};
+ }
+ function awardStats(p){
+  const s=Object.fromEntries(['apps','minutes','goals','assists','keyPasses','tackles','interceptions','saves','conceded','clean'].map(k=>[k,p[k]||0]));
+  s.rating=p.apps?Number((p.ratingSum/p.apps).toFixed(2)):0;s.saveRate=p.facedOnTarget?Number((p.saves/p.facedOnTarget*100).toFixed(2)):null;return s;
+ }
+ function periodAwards(g,p){
+  if(p?.awardSeasons)return p.awardSeasons;
+  if(!p)return [];
+  // Older saves can display their already-confirmed awards from the surviving season world.
+  return Object.values(g.worlds).filter(w=>w.awardsDone&&w.end>=p.start&&w.end<=(p.end||g.clock)&&matches(g).some(m=>!m.competition&&m.kind==='pro'&&m.country===w.country&&m.league===E.leagueLabel(w)&&m.minutes)).map(w=>({id:w.id,season:E.leagueLabel(w),country:w.country,year:w.year,awards:w.awards}));
+ }
+ function awardSeasons(g){
+  const all=new Map();for(const p of [...g.history,g.period])for(const s of p?.awardSeasons||[])all.set(s.id,s);
+  for(const w of Object.values(g.worlds).filter(w=>w.kind==='pro'))if(!all.has(w.id))all.set(w.id,{id:w.id,season:E.leagueLabel(w),country:w.country,year:w.year,awards:w.awards||[],complete:w.complete});
+  return [...all.values()].sort((a,b)=>b.year-a.year||a.country.localeCompare(b.country));
+ }
+ function honourStats(g,a){
+  if(a.stats)return a.stats;
+  if(a.playerId!=='USER-'+g.id)return null;
+  const rows=matches(g).filter(m=>!m.competition&&m.kind==='pro'&&m.country===a.country&&m.league===a.season);
+  if(!rows.length)return null;const s=aggregate(rows);s.facedOnTarget=rows.reduce((n,m)=>n+(m.facedOnTarget||0),0);return awardStats(s);
  }
  function awardSeason(g,w){
-  if(w.kind!=='pro'||w.awardsDone)return;ensureLeague(g,w);w.awardsDone=true;
+  if(w.kind!=='pro'||!w.complete||w.awardsDone)return;ensureLeague(g,w);w.awardsDone=true;
+  const minimum=Math.max(90,Math.ceil(Math.max(0,...w.table.map(t=>t.p))*90*.40));
+  const award=(p,extra)=>({playerId:p.id,player:p.name,club:p.club,clubId:p.clubId,pos:p.pos,season:E.leagueLabel(w),country:w.country,year:w.year,stats:awardStats(p),minimum,...extra});
   const categories=[['goals','득점왕'],['assists','도움왕'],['rating','시즌 최우수 선수'],['saveRate','최우수 골키퍼']];
-  w.awards=categories.flatMap(([metric,name])=>{const r=rankings(g,metric,w),first=r.rows[0];if(!first||first.value<=0)return [];return r.rows.filter(p=>p.value===first.value).map(p=>({name,metric,playerId:p.id,player:p.name,club:p.club,clubId:p.clubId,value:p.value,season:E.leagueLabel(w),country:w.country,year:w.year}));});
-  const all=leagueRows(g,w),minimum=Math.min(900,Math.max(90,...w.table.map(t=>t.p*90*.30))),formation={GK:1,CB:2,FB:2,MF:3,WG:2,ST:1};
-  for(const [pos,count] of Object.entries(formation)){const eligible=all.filter(p=>p.pos===pos&&p.minutes>=minimum).sort((a,b)=>b.rating-a.rating||b.minutes-a.minutes||a.id.localeCompare(b.id));for(const p of eligible.slice(0,count))w.awards.push({name:'베스트11',playerId:p.id,player:p.name,club:p.club,clubId:p.clubId,season:E.leagueLabel(w),country:w.country,year:w.year,pos});}
+  w.awards=categories.flatMap(([metric,name])=>{const r=rankings(g,metric,w),first=r.rows[0];if(!first||first.value<=0)return [];const winners=r.rows.filter(p=>p.rank===1);return winners.map(p=>award(p,{name,metric,value:p.value,joint:winners.length>1}));});
+  const all=leagueRows(g,w),formation={GK:1,CB:2,FB:2,MF:3,WG:2,ST:1};
+  for(const [pos,count] of Object.entries(formation)){const eligible=all.filter(p=>p.pos===pos&&p.minutes>=minimum).sort((a,b)=>b.ratingSum/b.apps-a.ratingSum/a.apps||b.minutes-a.minutes||a.id.localeCompare(b.id));for(const p of eligible.slice(0,count))w.awards.push(award(p,{name:'베스트11',metric:'rating',value:Number((p.ratingSum/p.apps).toFixed(2)),joint:false}));}
   for(const a of w.awards.filter(a=>a.playerId==='USER-'+g.id))if(!g.awards.some(v=>v.country===a.country&&v.season===a.season&&v.name===a.name)){g.awards.push(a);g.reputation+=3;g.period.events.push(a.season+' · '+a.name);}
+  if(all.some(p=>p.mine&&p.apps)){const seasons=g.period.awardSeasons||(g.period.awardSeasons=[]);if(!seasons.some(s=>s.id===w.id))seasons.push({id:w.id,season:E.leagueLabel(w),country:w.country,year:w.year,complete:true,awards:copy(w.awards)});}
  }
  function legacy(g){
   const s=E.totals(g),pos=g.player.pos,prime=g.prime||{ovr:E.overall(g.player),details:g.player.details,age:g.age,season:String(g.year),club:E.teamName(g),clubId:g.clubId};
@@ -286,6 +312,6 @@ const FootballCareer=(()=>{
   const score=Object.values(components).reduce((n,v)=>n+v,0),top=[...matches(g)].filter(m=>m.minutes).sort((a,b)=>b.rating-a.rating)[0];
   return {score,components,prime,stats:s,top,caption:score>=150?'한 시대를 대표한 선수':score>=100?'오래 기억될 이름':score>=50?'자신의 자리를 만든 선수':'첫 유니폼부터 마지막 휘슬까지'};
  }
- Object.assign(E,{randomName,environment,growthScale,roleFor,manager,objectiveValue,negotiate,trial,enlist,canMilitary,availableSpecial,startSpecial,finishSpecial,rankings,legacy,careerMatches:matches,aggregate});
+ Object.assign(E,{randomName,environment,growthScale,roleFor,manager,objectiveValue,negotiate,trial,enlist,canMilitary,availableSpecial,startSpecial,finishSpecial,rankings,legacy,careerMatches:matches,aggregate,periodAwards,awardSeasons,honourStats});
  return {initialise,migrate,startPeriod,finishPeriod,beforeMarket,extendOffers,acceptLoan,recordLeague,awardSeason,growthScale,trainingBuff,lateBonus,roleEffect,scouting};
 })();

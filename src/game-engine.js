@@ -148,29 +148,43 @@ function shootSide(g,attackPower,defensePower,count,context={}){
   const minute=int(g,1,90),active=context.app&&minute>context.app.from&&minute<=context.app.to;
   const player=active&&!context.opp&&rand(g)<context.share;
   const precision=player?playingSkill(g,{finishing:.60,composure:.25,positioning:.15}):attackPower;
-  const onChance=clamp(.22+precision*.005-defensePower*.001,.18,.82);
+  const onChance=clamp(.34+(precision-defensePower)*.0025,.20,.50);
   let keeper=defensePower;
   if(context.opp&&active&&g.player.pos==='GK')keeper=playingSkill(g,{reflexes:.32,diving:.23,gkPosition:.25,handling:.20});
   const finishing=player?playingSkill(g,{finishing:.65,composure:.20,positioning:.15}):attackPower;
-  let goalChance=clamp(.29+(finishing-keeper)*.004,.07,.66);
-  if(player)goalChance=clamp(goalChance*context.effects.goal,.05,.8);
+  let goalChance=clamp(.33+(finishing-keeper)*.0035,.10,.55);
+  // Specialties improve the player's finish, without stacking a team-wide scoring multiplier.
+  if(player)goalChance=clamp(goalChance*(1+Math.min(.20,(context.effects.goal-1)*.35)),.08,.62);
   const on=rand(g)<onChance,goal=on&&rand(g)<goalChance;
   shots.push({minute,player,on,goal,xg:onChance*goalChance,active});
  }return shots.sort((a,b)=>a.minute-b.minute);
+}
+const shotMean=(attack,defense,venue=0)=>clamp(10.5+(attack-defense)*.12+venue,4.5,17);
+function teamPerformance(g,attack,defense,venue=0){const shots=shootSide(g,attack,defense,Math.min(30,poisson(g,shotMean(attack,defense,venue))));return {goals:shots.filter(s=>s.goal).length,shots:shots.length,onTarget:shots.filter(s=>s.on).length};}
+function teamGoals(g,attack,defense,venue=0){return teamPerformance(g,attack,defense,venue).goals;}
+function matchRating(pos,m,variation=0){
+ if(!m.minutes)return 0;
+ let score=6.1+variation;
+ if(pos==='GK'){const faced=m.facedOnTarget||0;score+=(m.saves||0)*.16+(m.claims||0)*.08-(m.conceded||0)*.48+(faced>=3?((m.saves||0)/faced-.65)*1.2:0)+(m.clean||0)*.45;}
+ else score+=(m.goals||0)*.82+(m.assists||0)*.52+(m.keyPasses||0)*.07+(m.dribbles||0)*.045+(m.tackles||0)*.06+(m.interceptions||0)*.06+(m.passes?((m.completed||0)/m.passes-.75)*.8:0)+(m.clean&&['CB','FB'].includes(pos)?.4:0);
+ score+=(m.own>m.opp?.12:m.own<m.opp?-.15:0)-(m.red?.9:0);
+ return round(clamp(score,3,10));
 }
 function simulateAppearance(g,ownPower,opponentPower,day,ownHome=true,neutral=false,national=false){
  recover(g,day);
  const app=appearance(g,ownPower,day,national),e=app.minutes?effects(g):{attack:1,defend:1,goal:1,assist:1,fitness:1},p=g.player,time=app.minutes/90;
  const attack=playingSkill(g,{positioning:.22,finishing:.20,dribbling:.20,speed:.12,vision:.14,passing:.12});
  const defense=playingSkill(g,{marking:.25,tackle:.23,interceptions:.25,reactions:.12,strength:.15});
- const ownAttack=ownPower+(attack-ownPower)*time*(['ST','WG','MF'].includes(p.pos)?.20:.08),ownDefense=ownPower+(defense-ownPower)*time*(['CB','FB','MF'].includes(p.pos)?.22:.06);
- const homeBonus=neutral?0:ownHome?1.2:-.4;
- const ownShots=Math.min(32,poisson(g,clamp(9.5+(ownAttack-opponentPower)*.13+homeBonus,3,20)/3)+poisson(g,clamp(9.5+(ownAttack-opponentPower)*.13+homeBonus,3,20)/3)+poisson(g,clamp(9.5+(ownAttack-opponentPower)*.13+homeBonus,3,20)/3));
- const oppositionMean=clamp(9.5+(opponentPower-ownDefense)*.13-homeBonus,3,20)/e.defend;
- const opponentShots=Math.min(32,poisson(g,oppositionMean/3)+poisson(g,oppositionMean/3)+poisson(g,oppositionMean/3));
- const role={ST:.40,WG:.27,MF:.15,CB:.055,FB:.075,GK:0}[p.pos];
- const share=clamp(role*(.5+playingSkill(g,{positioning:.45,speed:.2,dribbling:.2,composure:.15})/100)*(p.tactic==='attack'?1.12:p.tactic==='defense'?.75:1),0,.65);
- const ownEvents=shootSide(g,ownAttack*e.attack,opponentPower,ownShots,{app,share,effects:e});
+ const attackRole=['ST','WG','MF'].includes(p.pos)?.20:.08,defenseRole=['CB','FB','MF'].includes(p.pos)?.22:.06;
+ const ownAttack=ownPower+(attack-ownPower)*time*attackRole;
+ const ownDefense=ownPower+(defense-ownPower)*time*defenseRole;
+ const ownVenue=neutral?0:ownHome?.75:-.40,oppVenue=neutral?0:ownHome?-.40:.75;
+ const ownShots=Math.min(30,poisson(g,shotMean(ownAttack,opponentPower,ownVenue)));
+ const opponentShots=Math.min(30,poisson(g,shotMean(opponentPower,ownDefense,oppVenue)/(1+(e.defend-1)*time*defenseRole)));
+ const role={ST:.30,WG:.22,MF:.14,CB:.045,FB:.07,GK:0}[p.pos];
+ const movement=playingSkill(g,{positioning:.45,speed:.2,dribbling:.2,composure:.15});
+ const share=clamp(role*clamp(1+(movement-ownPower)*.007,.70,1.28)*(1+(e.attack-1)*.5)*(p.tactic==='attack'?1.10:p.tactic==='defense'?.75:1),0,.45);
+ const ownEvents=shootSide(g,ownAttack,opponentPower,ownShots,{app,share,effects:e});
  const oppEvents=shootSide(g,opponentPower,ownDefense,opponentShots,{app,opp:true,share:0,effects:e});
  const own=ownEvents.filter(s=>s.goal).length,opp=oppEvents.filter(s=>s.goal).length,personal=ownEvents.filter(s=>s.player);
  const assistShare={ST:.17,WG:.33,MF:.43,CB:.075,FB:.24,GK:.008}[p.pos]*(.4+playingSkill(g,{vision:.55,passing:.35,composure:.1})/110)*e.assist;
@@ -190,13 +204,8 @@ function simulateAppearance(g,ownPower,opponentPower,day,ownHome=true,neutral=fa
  const saves=p.pos==='GK'?activeOpp.filter(s=>s.on&&!s.goal).length:0;
  const claims=p.pos==='GK'?binomial(g,poisson(g,time*2.5),clamp(playingSkill(g,{handling:.65,gkPosition:.25,strength:.1})/110,.2,.94)):0;
  const clean=app.minutes>=60&&conceded===0?1:0;
- let score=6.1+(rand(g)-.5)*.45;
- if(app.minutes){
-  if(p.pos==='GK'){const faced=activeOpp.filter(s=>s.on).length;score+=saves*.16+claims*.08-conceded*.48+(faced>=3?(saves/faced-.65)*1.2:0)+clean*.45;}
-  else score+=goals*.82+assists*.52+keyPasses*.07+dribbles*.045+tackles*.06+interceptions*.06+(passes?(completed/passes-.75)*.8:0)+(clean&&['CB','FB'].includes(p.pos)?.4:0);
-  score+=(own>opp?.12:own<opp?-.15:0)-(app.red?.9:0);
- }
- return{...app,own,opp,goals,assists,shots:personal.length,onTarget,passes,completed,keyPasses,dribbleAttempts,dribbles,tackleAttempts,tackles,interceptions,claims,saves,conceded,clean,rating:app.minutes?round(clamp(score,3,10)):0,teamShots:ownShots,teamOnTarget:ownEvents.filter(s=>s.on).length,opponentShots,opponentOnTarget:oppEvents.filter(s=>s.on).length,facedOnTarget:activeOpp.filter(s=>s.on).length,xg:round(personal.reduce((n,s)=>n+s.xg,0)),matchDay:day,modelVersion:3};
+ const frame={...app,own,opp,goals,assists,shots:personal.length,onTarget,passes,completed,keyPasses,dribbleAttempts,dribbles,tackleAttempts,tackles,interceptions,claims,saves,conceded,clean,teamShots:ownShots,teamOnTarget:ownEvents.filter(s=>s.on).length,opponentShots,opponentOnTarget:oppEvents.filter(s=>s.on).length,facedOnTarget:activeOpp.filter(s=>s.on).length,xg:round(personal.reduce((n,s)=>n+s.xg,0)),matchDay:day,modelVersion:4};
+ frame.rating=matchRating(p.pos,frame,(rand(g)-.5)*.45);return frame;
 }
 function rollCandidate(g,pos,talentId){
  const a=pick(g,eligibleArch(pos)),details={};
@@ -280,12 +289,13 @@ function migrate(g){
   g.youthVersion=1;g.youthCups=g.youthCups||{};g.youthKnockoutFrom=g.period?.trained?g.target:g.clock;
   g.startOrigin=g.startOrigin||{kind:g.middleSchoolId?'school':'legacy',id:g.middleSchoolId||null,name:school(g.middleSchoolId)?.name||'기존 시작 기록'};changed=true;
  }
- if(g.simulationVersion!==3){
+ if(!g.simulationVersion||g.simulationVersion<3){
   health(g);g.simulationVersion=3;changed=true;
   if(g.period?.trained)g.period.legacyTraining=true;
   if(g.period){trainingLedger(g);g.period.weakStart=g.player.weakFoot;g.period.previousStartOvr=g.period.startOvr;g.period.startOvr=overall(p);}
   recalc(p);
  }
+ if(g.simulationVersion!==4){g.simulationVersion=4;changed=true;}
  if(career()?.migrate(g))changed=true;
  if(national()?.migrate(g))changed=true;
  if(expansion()?.migrate(g))changed=true;
@@ -300,7 +310,7 @@ function create(data,c,seed){
  p.focus=normaliseFocus(p,data.focus);ARCH[aid].keys.forEach(k=>p.details[k]=clamp(p.details[k]+4,1,99));recalc(p);
  const origin=assignStart(seed),selectedSchool=origin.kind==='school'?school(origin.id):null;
  const g={version:2,developmentVersion:2,era:'2000',startYear:D.START_YEAR,birthYear:D.START_YEAR-15,id:'FC-'+(seed>>>0).toString(36).toUpperCase(),seed:origin.seed,clock:tick(D.START_YEAR,3),year:D.START_YEAR,age:15,stage:selectedSchool?'middle':'academy',country:origin.country,clubId:origin.id,middleSchoolId:selectedSchool?.id||null,academyStart:selectedSchool?null:D.START_YEAR,player:p,training:'balanced',intensity:'normal',form:50,morale:65,fitness:100,trust:60,reputation:0,wage:0,contract:0,income:0,history:[],champions:[],journey:[],national:[],worlds:{},trophies:[],graduationRolled:false,retired:false,youthVersion:1,youthKnockoutFrom:tick(D.START_YEAR,3),youthCups:{},startOrigin:origin};
- p.styleVersion=2;p.plusChoices=[];g.simulationVersion=3;health(g);
+ p.styleVersion=2;p.plusChoices=[];g.simulationVersion=4;health(g);
  career()?.initialise(g);national()?.initialise(g);expansion()?.initialise(g);newPeriod(g);unlock(g);return g;
 }
 function assignStart(seed){
@@ -444,10 +454,10 @@ function recordMatch(g,w,f,home,away,frame){
 function runFixture(g,w,f,allowPlayer=true){
  const a=w.table.find(c=>c.id===f.h),b=w.table.find(c=>c.id===f.a);
  const involved=allowPlayer&&g.country===w.country&&(g.stage==='pro'?'pro':g.stage)===w.kind&&(f.h===g.clubId||f.a===g.clubId);
- let x,y,frame;
- if(involved){const ownHome=f.h===g.clubId;frame=simulateAppearance(g,ownHome?a.power:b.power,ownHome?b.power:a.power,fixtureDay(g,f),ownHome,!!w.neutral);x=ownHome?frame.own:frame.opp;y=ownHome?frame.opp:frame.own;}
- else{x=poisson(g,clamp((w.neutral?1.3:1.4)+(a.power-b.power)*.045,.25,3.5));y=poisson(g,clamp((w.neutral?1.3:1.13)+(b.power-a.power)*.045,.2,3.3));}
- Object.assign(f,{done:true,x,y});a.p++;b.p++;a.gf+=x;a.ga+=y;b.gf+=y;b.ga+=x;
+ let x,y,frame,homeStats,awayStats;
+ if(involved){const ownHome=f.h===g.clubId;frame=simulateAppearance(g,ownHome?a.power:b.power,ownHome?b.power:a.power,fixtureDay(g,f),ownHome,!!w.neutral);x=ownHome?frame.own:frame.opp;y=ownHome?frame.opp:frame.own;const ownStats={shots:frame.teamShots,onTarget:frame.teamOnTarget},oppStats={shots:frame.opponentShots,onTarget:frame.opponentOnTarget};homeStats=ownHome?ownStats:oppStats;awayStats=ownHome?oppStats:ownStats;}
+ else{homeStats=teamPerformance(g,a.power,b.power,w.neutral?0:.75);awayStats=teamPerformance(g,b.power,a.power,w.neutral?0:-.40);x=homeStats.goals;y=awayStats.goals;}
+ Object.assign(f,{done:true,x,y,homeShots:homeStats.shots,awayShots:awayStats.shots,homeOnTarget:homeStats.onTarget,awayOnTarget:awayStats.onTarget});a.p++;b.p++;a.gf+=x;a.ga+=y;b.gf+=y;b.ga+=x;
  if(x>y){a.w++;a.pts+=3;b.l++;}else if(x<y){b.w++;b.pts+=3;a.l++;}else{a.d++;b.d++;a.pts++;b.pts++;}
  if(involved)recordMatch(g,w,f,x,y,frame);
  if(w.kind==='pro')career()?.recordLeague(g,w,f,involved?frame:null);
@@ -510,5 +520,5 @@ function advance(g){
 function accept(g,id){if(g.phase!=='market')return false;const o=g.offers.find(v=>v.id===id);if(!o||o.kind==='trial')return false;if(o.kind==='loan'){if(!career()?.acceptLoan(g,o))return false;}else if(o.kind==='stay'){if(g.stage==='pro'&&!g.loan&&g.military?.status!=='service'){g.contract=o.months;g.wage=o.wage;g.contractTerms={role:o.roleId||g.contractTerms?.role||'rotation',bonus:o.bonus||0};}}else{g.clubId=o.clubId;g.country=o.country;g.stage=o.kind;g.wage=o.wage;g.contract=o.months;g.trust=55;g.contractTerms={role:o.roleId||'prospect',bonus:o.bonus||0};if(o.kind==='academy')g.academyStart=g.year;if(['university','semipro'].includes(o.kind))g.routeStart=g.year;g.journey.push({date:g.clock,clubId:o.clubId,name:o.name,kind:o.kind,wage:o.wage,rare:!!o.rare});}g.fitness=clamp(g.fitness+18,30,100);g.morale=70;newPeriod(g);return true}
 function totals(g){const result=blankStats();const rows=[...g.history];if(g.period&&g.phase!=='market'&&g.phase!=='retired')rows.push(g.period);for(const r of rows)for(const k of Object.keys(result))result[k]+=r[k]||0;result.rating=result.apps?round(result.ratingSum/result.apps):0;return result}
 function retire(g){if(g.age<30||!['ready','market'].includes(g.phase))return false;if(g.phase==='ready'&&g.period.matches.length){g.period.end=g.clock;g.history.push(JSON.parse(JSON.stringify(g.period)))}g.retired=true;g.phase='retired';return true}
-return{...D,NAMES,dayAt,fixtureDay,health,injuryAt,injuryDays,injure,settleDevelopment,simulateAppearance,matchDevelopment,developmentSummary,assignStart,usesYouthCups,youthSeason,roundName,meets,styleProgress,plusOptions,plusCapacity,upgradePlus,clubsFor,school,leagueName,activeAttributes,attributeName,growthType,agePhase,trainingOptions,normaliseFocus,clamp,round,rand,int,shuffle,tick,date,dateText,club,level,overall,effective,recalc,groupKeys,eligibleArch,candidates,makeCandidate,talent,talentBonus,growthMultiplier,injuryRisk,migrate,create,teamName,stageName,slots,availableStyles,equip,plus,effects,xp,unlock,advance,internationalMatch,returnFromCamp,accept,totals,retire,sortTable,seasonWorld,leagueLabel,makeWorld,runWorld,offers,blankStats,train,newPeriod,stableSeed,addDevelopment,recordMatch};
+return{...D,NAMES,dayAt,fixtureDay,health,injuryAt,injuryDays,injure,settleDevelopment,simulateAppearance,teamGoals,teamPerformance,matchRating,matchDevelopment,developmentSummary,assignStart,usesYouthCups,youthSeason,roundName,meets,styleProgress,plusOptions,plusCapacity,upgradePlus,clubsFor,school,leagueName,activeAttributes,attributeName,growthType,agePhase,trainingOptions,normaliseFocus,clamp,round,rand,int,shuffle,tick,date,dateText,club,level,overall,effective,recalc,groupKeys,eligibleArch,candidates,makeCandidate,talent,talentBonus,growthMultiplier,injuryRisk,migrate,create,teamName,stageName,slots,availableStyles,equip,plus,effects,xp,unlock,advance,internationalMatch,returnFromCamp,accept,totals,retire,sortTable,seasonWorld,leagueLabel,makeWorld,runWorld,offers,blankStats,train,newPeriod,stableSeed,addDevelopment,recordMatch};
 })();
