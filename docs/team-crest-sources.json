@@ -1,0 +1,364 @@
+{
+  "retrieved": "2026-10-08",
+  "note": "학교와 구단의 현재 확인 가능한 실제 표장입니다. 2000년 당시의 표장과 다를 수 있습니다. 원본 이미지를 보존하고 필요한 경우 SVG viewBox로 교표 부분만 표시합니다. 중동·경신 중학교는 같은 재단 중고교의 공용 교표를 사용합니다.",
+  "sharedSymbols": {
+    "MS-joongdong": "https://www.namu.moe/w/중동중학교",
+    "MS-gyeongsin": "https://seore.org/w/경신중학교(서울)"
+  },
+  "entries": [
+    {
+      "id": "MS-anyong",
+      "name": "안용중학교",
+      "page": "https://anyong-m.goehs.kr/anyong-m/ss/schulSymbol/selectSongSymbolInfo.do?mi=14849",
+      "image": "https://anyong-m.goehs.kr/upload/anyong-m/ss/img_9d65d13b-d4f7-479e-bd3a-4ce624b947d51700464068862.png",
+      "width": 200,
+      "height": 160
+    },
+    {
+      "id": "MS-mullae",
+      "name": "문래중학교",
+      "page": "https://mullae.sen.ms.kr/124735/subMenu.do",
+      "image": "https://mullae.sen.ms.kr/crosseditor/binary/images/2017/06/07/20170607110353524_R01TCYQI.jpg",
+      "width": 569,
+      "height": 798,
+      "crop": [
+        328,
+        232,
+        173,
+        73
+      ]
+    },
+    {
+      "id": "MS-anyang",
+      "name": "안양중학교",
+      "page": "https://anyang-m.goeay.kr/anyang-m/ss/schulSymbol/selectSongSymbolInfo.do?mi=8786",
+      "image": "https://anyang-m.goeay.kr/upload/anyang-m/ss/img_54b29f5a-5cb2-4249-bcd1-1e884753ac8f1695358677807.png",
+      "height": 160,
+      "width": 200
+    },
+    {
+      "id": "MS-poongsaeng",
+      "name": "풍생중학교",
+      "page": "https://www.goesn.kr/ps-m/cm/cntnts/cntntsView.do?mi=16671&cntntsId=3154",
+      "image": "https://www.goesn.kr/images/ps-m/sub/img_symbol1.png",
+      "height": 189,
+      "width": 151
+    },
+    {
+      "id": "MS-masan",
+      "name": "마산중앙중학교",
+      "page": "https://masanja-m.gne.go.kr/masanja-m/ss/schulSymbol/selectSongSymbolInfo.do?mi=121459",
+      "image": "https://masanja-m.gne.go.kr/upload_sch/masanja-m/ss/img_c31b05df-d427-4a30-888d-ab57d00025351583735811658.png",
+      "height": 161,
+      "width": 158
+    },
+    {
+      "id": "HS-suwongong",
+      "name": "수원공업고등학교",
+      "page": "https://www.goesw.kr/sugong-h/cm/cntnts/cntntsView.do?mi=6602&cntntsId=3584",
+      "image": "https://www.goesw.kr/upload/sugong-h/cntntsFile/2025/12/D4C1AC39-D2C9-3679-F064-66A722E8ABF0.png",
+      "height": 158,
+      "width": 198
+    },
+    {
+      "id": "MS-bupyeongdong",
+      "name": "부평동중학교",
+      "page": "https://bupyeongdong.icems.kr/sub/info.do?m=0104&s=bupyeongdong",
+      "image": "https://bupyeongdong.icems.kr/images/template/10057/common/logo.png?x=202207",
+      "height": 39,
+      "width": 145,
+      "crop": [
+        0,
+        5,
+        30,
+        29
+      ]
+    },
+    {
+      "id": "MS-iridong",
+      "name": "이리동중학교",
+      "page": "https://school.jbedu.kr/iridong/M010202/index.do",
+      "image": "https://school.jbedu.kr/files/2025/11/iridong/98ba5281f3b6458a8a3da697e746501b/01.png",
+      "height": 145,
+      "width": 160
+    },
+    {
+      "id": "MS-namsuwon",
+      "name": "남수원중학교",
+      "page": "https://websupport.goesw.kr/namsuwon-m/cm/cntnts/cntntsView.do?mi=3527&cntntsId=3593",
+      "image": "https://websupport.goesw.kr/upload/namsuwon-m/cntntsFile/2025/12/782A7878-8B17-2689-8358-1D7A5321468D.png",
+      "height": 158,
+      "width": 198
+    },
+    {
+      "id": "MS-jangheung",
+      "name": "장흥중학교",
+      "page": "https://jangheung.jge.ms.kr/jangheung_ms/cm/cntnts/cntntsView.do?mi=10213719&cntntsId=20249531",
+      "image": "https://jangheung.jge.ms.kr/images/web/jangheung_ms/common/logo.png",
+      "height": 40,
+      "width": 129,
+      "crop": [
+        0,
+        0,
+        40,
+        40
+      ]
+    },
+    {
+      "id": "MS-gwangcheol",
+      "name": "광양제철중학교",
+      "page": "https://gwangcheol.jge.ms.kr/wgwangcheol_ms/cm/cntnts/cntntsView.do?mi=10205042&cntntsId=10248706",
+      "image": "https://gwangcheol.jge.ms.kr/images/web/wgwangcheol_ms/sub/symbol_ci.png",
+      "height": 145,
+      "width": 200
+    },
+    {
+      "id": "MS-cheonho",
+      "name": "천호중학교",
+      "page": "https://cheonho.sen.ms.kr/86443/subMenu.do",
+      "image": "https://cheonho.sen.ms.kr/crosseditor/binary/build_images_new/images/001817/image_6.png",
+      "height": 780,
+      "width": 505,
+      "crop": [
+        74,
+        315,
+        119,
+        120
+      ]
+    },
+    {
+      "id": "HS-baejae",
+      "name": "배재고등학교",
+      "page": "https://paichai.hs.kr/information/motto_symbols.php",
+      "image": "https://paichai.hs.kr/img/sub/symbol-img5.jpg",
+      "height": 488,
+      "width": 1041,
+      "crop": [
+        137,
+        68,
+        270,
+        335
+      ]
+    },
+    {
+      "id": "HS-joongdong",
+      "name": "중동고등학교",
+      "page": "https://joongdong.hs.kr/?c=A01/A18",
+      "image": "https://joongdong.hs.kr/layouts/joongdong/images/logo_btm.png",
+      "height": 59,
+      "width": 59
+    },
+    {
+      "id": "MS-joongdong",
+      "name": "중동중학교",
+      "page": "https://joongdong.hs.kr/?c=A01/A18",
+      "image": "https://joongdong.hs.kr/layouts/joongdong/images/logo_btm.png",
+      "height": 59,
+      "width": 59
+    },
+    {
+      "id": "HS-bupyeong",
+      "name": "부평고등학교",
+      "page": "https://bupyeong.icehs.kr/sub/info.do?m=0102&s=bupyeong",
+      "image": "https://bupyeong.icehs.kr/images/template/10055/common/logo.png?x=202207",
+      "height": 39,
+      "width": 156,
+      "crop": [
+        0,
+        0,
+        40,
+        39
+      ]
+    },
+    {
+      "id": "HS-gwangcheol",
+      "name": "광양제철고등학교",
+      "page": "https://gwangcheol.jge.hs.kr/gwangcheol_hs/ss/schulSymbol/selectSongSymbolInfo.do?mi=71431",
+      "image": "https://gwangcheol.jge.hs.kr/images/web/gwangcheol_hs/common/logo.png",
+      "height": 39,
+      "width": 207,
+      "crop": [
+        0,
+        0,
+        40,
+        39
+      ]
+    },
+    {
+      "id": "MS-hanyang",
+      "name": "한양중학교",
+      "page": "https://hanyang.sen.ms.kr/60455/subMenu.do",
+      "image": "https://hanyang.sen.ms.kr/crosseditor/binary/images/2017/03/14/20170314133352791_5WNULLGM.png",
+      "width": 147,
+      "height": 147
+    },
+    {
+      "id": "HS-hyundai",
+      "name": "현대고등학교",
+      "page": "https://school.use.go.kr/hdhs-h/M010217/",
+      "image": "https://school.use.go.kr/files/2025/04/hdhs-h/164d71004e6c44a1a7c53b390b9da6fc/01.gif",
+      "height": 180,
+      "width": 590,
+      "crop": [
+        364,
+        59,
+        92,
+        86
+      ]
+    },
+    {
+      "id": "MS-pocheol",
+      "name": "포항제철중학교",
+      "page": "https://school.gyo6.net/pocheolms/main.do?sysId=pocheolms",
+      "image": "https://school.gyo6.net/images/web/pocheolms/common/logo.png",
+      "height": 39,
+      "width": 163,
+      "crop": [
+        0,
+        0,
+        39,
+        39
+      ]
+    },
+    {
+      "id": "HS-pocheol",
+      "name": "포항제철공업고등학교",
+      "page": "https://school.gyo6.net/pocheoltechhs/main.do?sysId=pocheoltechhs/",
+      "image": "https://school.gyo6.net/images/web/pocheoltechhs/common/logo.png",
+      "height": 42,
+      "width": 161,
+      "crop": [
+        0,
+        5,
+        26,
+        31
+      ]
+    },
+    {
+      "id": "HS-dongbuk",
+      "name": "동북고등학교",
+      "page": "https://dongbuk.sen.hs.kr/88236/subMenu.do",
+      "image": "https://dongbuk.sen.hs.kr/crosseditor/binary/images/2017/03/18/20170318193505934_LHLUF02I.jpg",
+      "width": 590,
+      "height": 862,
+      "crop": [
+        43,
+        216,
+        137,
+        142
+      ]
+    },
+    {
+      "id": "MS-bukseong",
+      "name": "광주북성중학교",
+      "page": "https://buksung.jge.ms.kr/sub/page.php?page_code=intro_06",
+      "image": "https://buksung.jge.ms.kr/data_files/skin/skin_res_1/images/common/logo.png",
+      "width": 222,
+      "height": 43,
+      "crop": [
+        0,
+        0,
+        50,
+        43
+      ]
+    },
+    {
+      "id": "MS-gyeongsin",
+      "name": "경신중학교",
+      "page": "https://kyungshin.sen.hs.kr/115778/subMenu.do",
+      "image": "https://kyungshin.sen.hs.kr/crosseditor/binary/build_images_new/images/001685/image_11.png",
+      "height": 707,
+      "width": 982,
+      "crop": [
+        6,
+        28,
+        134,
+        140
+      ]
+    },
+    {
+      "id": "EN-bradford",
+      "name": "Bradford City",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/england/Bradford_City.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/england/Bradford_City.svg"
+    },
+    {
+      "id": "EN-charlton",
+      "name": "Charlton Athletic",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/england/Charlton_Athletic.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/england/Charlton_Athletic.svg"
+    },
+    {
+      "id": "EN-derby",
+      "name": "Derby County",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/england/Derby_County.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/england/Derby_County.svg"
+    },
+    {
+      "id": "EN-middlesbrough",
+      "name": "Middlesbrough",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/england/Middlesbrough.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/england/Middlesbrough.svg"
+    },
+    {
+      "id": "FR-sedan",
+      "name": "CS Sedan Ardennes",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/france/CS_Sedan_Ardennes.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/france/CS_Sedan_Ardennes.svg"
+    },
+    {
+      "id": "DE-rostock",
+      "name": "Hansa Rostock",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/germany/Hansa_Rostock.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/germany/Hansa_Rostock.svg"
+    },
+    {
+      "id": "DE-unterhaching",
+      "name": "SpVgg Unterhaching",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/germany/SpVgg_Unterhaching.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/germany/SpVgg_Unterhaching.svg"
+    },
+    {
+      "id": "IT-bari",
+      "name": "Bari",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/italy/Bari.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/italy/Bari.svg"
+    },
+    {
+      "id": "IT-brescia",
+      "name": "Brescia",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/italy/Brescia.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/italy/Brescia.svg"
+    },
+    {
+      "id": "IT-perugia",
+      "name": "Perugia",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/italy/Perugia.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/italy/Perugia.svg"
+    },
+    {
+      "id": "IT-reggina",
+      "name": "Reggina 1914",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/italy/Reggina_1914.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/italy/Reggina_1914.svg"
+    },
+    {
+      "id": "IT-vicenza",
+      "name": "Vicenza",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/italy/Vicenza.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/italy/Vicenza.svg"
+    },
+    {
+      "id": "ES-numancia",
+      "name": "Numancia",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/spain/Numancia.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/spain/Numancia.svg"
+    },
+    {
+      "id": "ES-zaragoza",
+      "name": "Real Zaragoza",
+      "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/spain/Real_Zaragoza.svg",
+      "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/spain/Real_Zaragoza.svg"
+    }
+  ]
+}

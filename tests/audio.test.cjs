@@ -1,0 +1,31 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const source=['soundtracks.js','game-audio.js'].map(n=>fs.readFileSync(path.join(__dirname,'../src',n),'utf8')).join('\n');
+function setup(storage=new Map(),supported=true){
+ const intervals=new Map(),created=[],listeners={};let next=0;
+ const param=()=>({value:0,cancelScheduledValues(){},setValueAtTime(v){this.value=v},linearRampToValueAtTime(v){this.value=v},exponentialRampToValueAtTime(v){this.value=v}});
+ const node=()=>({gain:param(),pan:param(),frequency:param(),playbackRate:param(),connect(){},disconnect(){},start(at){this.startedAt=at},stop(at){this.stoppedAt=at},onended:null});
+ class Context{constructor(){this.state='suspended';this.currentTime=0;this.sampleRate=8000;this.destination=node();this.sources=[];created.push(this)}createGain(){return node()}createStereoPanner(){return node()}createBufferSource(){const s=node();this.sources.push(s);return s}createOscillator(){const s=node();this.sources.push(s);return s}createBuffer(ch,length,rate){const samples=new Float32Array(length);return {duration:length/rate,getChannelData:()=>samples}}resume(){this.state='running';return Promise.resolve()}suspend(){this.state='suspended';return Promise.resolve()}}
+ const context={window:supported?{AudioContext:Context}:{},document:{hidden:false,addEventListener:(name,fn)=>listeners[name]=fn},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},setInterval:fn=>{intervals.set(++next,fn);return next},clearInterval:id=>intervals.delete(id)};
+ vm.createContext(context);vm.runInContext(source+';this.audio=FootballAudio;this.tracks=FootballSoundtracks;',context);
+ return {audio:context.audio,tracks:context.tracks,created,intervals,storage,context,tick(t){created[0].currentTime=t;for(const fn of intervals.values())fn()},flush:()=>new Promise(setImmediate)};
+}
+test('four original scores have valid notes, complete bars and distinct melodies',()=>{
+ const u=setup(),scores=new Set();for(const id of ['middle','high','national','overseas']){const t=u.tracks.themes[id],s=u.tracks.score(id);assert.equal(t.melody.length,16);assert.equal(t.chords.length,16);for(const bar of t.melody)assert.equal(bar.split(' ').length,t.beats*2);assert.ok(s.beats*s.secondsPerBeat>=40);for(const note of s.notes){assert.ok(note.midi>=35&&note.midi<=91);assert.ok(note.beat>=0&&note.beat<s.beats);assert.ok(note.gain>0&&note.gain<.3)}scores.add(JSON.stringify(s.notes))}assert.equal(scores.size,4);assert.equal(u.tracks.midi('-'),null);
+});
+test('stage and national-team scenes select the right theme; transfers use destination',()=>{
+ const a=setup().audio;assert.equal(a.themeFor(null),'middle');assert.equal(a.themeFor({stage:'middle',country:'KR'}),'middle');assert.equal(a.themeFor({stage:'academy',country:'KR'}),'high');assert.equal(a.themeFor({stage:'academy',country:'EN'}),'overseas');assert.equal(a.themeFor({stage:'pro',country:'FR',phase:'international'}),'national');assert.equal(a.themeFor({stage:'pro',country:'FR'},'국가대표 경기'),'national');assert.equal(a.themeFor({stage:'middle',country:'KR'},'',{stage:'academy',country:'DE'}),'overseas');
+});
+test('playback requires a gesture, rerenders do not restart music, themes crossfade with one scheduler',async()=>{
+ const u=setup();u.audio.sync(null);assert.equal(u.created.length,0);u.audio.unlock();await u.flush();assert.equal(u.intervals.size,1);u.tick(.09);const first=u.created[0].sources.length;assert.ok(first>0);u.audio.sync(null);u.audio.sync(null);await u.flush();assert.equal(u.created[0].sources.length,first);assert.equal(u.intervals.size,1);u.audio.sync({stage:'academy',country:'KR'});assert.equal(u.audio.getTheme(),'high');assert.equal(u.intervals.size,1);assert.ok(u.created[0].sources[0].stoppedAt>=.09);u.tick(.19);assert.ok(u.created[0].sources.length>first);
+});
+test('mute and separate volumes survive reload without touching career data',async()=>{
+ const state=new Map([['this-life-football-v2','existing career'],['football-life-preferences','{"reducedMotion":true}']]),u=setup(state);u.audio.setMuted(true);u.audio.setVolume('music',.17);u.audio.setVolume('effects',.81);u.audio.unlock();await u.flush();u.audio.click();assert.equal(u.intervals.size,0);assert.equal(u.created[0].sources.length,0);const reload=setup(state);assert.equal(reload.audio.getSettings().muted,true);assert.equal(reload.audio.getSettings().music,.17);assert.equal(reload.audio.getSettings().effects,.81);assert.equal(state.get('this-life-football-v2'),'existing career');assert.equal(state.get('football-life-preferences'),'{"reducedMotion":true}');u.audio.setMuted(false);await u.flush();assert.equal(u.intervals.size,1);u.audio.setVolume('music',0);assert.equal(u.intervals.size,0);u.audio.click();assert.ok(u.created[0].sources.length>=2);u.audio.setVolume('music',.4);await u.flush();assert.equal(u.intervals.size,1);
+});
+test('hidden pages pause; returning starts fresh without accumulating timers or missed notes',async()=>{
+ const u=setup();u.audio.click();await u.flush();u.tick(.1);u.audio.visibility(true);assert.equal(u.intervals.size,0);assert.equal(u.created[0].state,'suspended');const count=u.created[0].sources.length;u.tick(180);assert.equal(u.created[0].sources.length,count);u.audio.visibility(false);await u.flush();assert.equal(u.intervals.size,1);assert.equal(u.created[0].state,'running');u.tick(180.1);assert.ok(u.created[0].sources.length-count<=6);for(let i=0;i<4;i++){u.audio.visibility(true);u.audio.visibility(false);await u.flush();assert.equal(u.intervals.size,1)}
+});
+test('unsupported audio and malformed preferences keep the game usable',async()=>{
+ const u=setup(new Map([['football-life-audio','{"music":null,"effects":"bad","muted":"yes"}']]),false);assert.equal(u.audio.getSettings().music,.32);assert.equal(u.audio.getSettings().effects,.55);assert.equal(u.audio.getSettings().muted,false);for(const fn of [()=>u.audio.click(),()=>u.audio.setMuted(true),()=>u.audio.setVolume('music',.5),()=>u.audio.visibility(true),()=>u.audio.visibility(false)])assert.doesNotThrow(fn);assert.equal(u.intervals.size,0);assert.doesNotThrow(()=>setup(new Map([['football-life-audio','broken json']])));
+});
+
