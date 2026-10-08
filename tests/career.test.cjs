@@ -6,9 +6,9 @@ test('six complete careers progress through schools, professional football and r
   const g=make(pos),initial=E.overall(g.player);let peak=initial,halves=0;
   while(!g.retired&&halves++<60){
    g.training='core';const physical=Object.fromEntries(E.activeAttributes(g.player).filter(id=>E.growthType(id)==='physical').map(id=>[id,g.player.details[id]])),age=g.age;
-   for(let guard=0;['ready','international'].includes(g.phase);guard++){
-    assert.ok(guard<30,'half cannot stall');
-    if(g.phase==='international'){while(!g.camp.complete)E.internationalMatch(g);E.returnFromCamp(g);}else E.advance(g);
+   for(let guard=0;['ready','callup','international'].includes(g.phase);guard++){
+    assert.ok(guard<40,'half cannot stall');
+    if(g.phase==='callup')E.respondCallup(g,true);else if(g.phase==='international'){while(!g.camp.complete)E.internationalMatch(g);E.returnFromCamp(g);}else E.advance(g);
    }
    peak=Math.max(peak,E.overall(g.player));assert.ok(Number.isFinite(E.overall(g.player)));
    for(const value of Object.values(g.player.details))assert.ok(Number.isFinite(value)&&value>=10&&value<=99);

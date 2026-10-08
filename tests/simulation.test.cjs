@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),load=require('./load-engine.cjs');
 const E=load();
 const make=(pos='ST',seed=914)=>E.create({name:'테스트 선수',number:9,pos,foot:'right',focus:[]},E.makeCandidate(pos,seed,'ordinary'),seed);
-const finish=g=>{for(let safety=0;safety<30&&(g.phase==='ready'||g.phase==='international');safety++){if(g.phase==='international'){while(!g.camp.complete)E.internationalMatch(g);E.returnFromCamp(g);}else E.advance(g);}assert.ok(g.phase!=='ready'&&g.phase!=='international');};
+const finish=g=>{for(let safety=0;safety<40&&['ready','callup','international'].includes(g.phase);safety++){if(g.phase==='callup')E.respondCallup(g,true);else if(g.phase==='international'){while(!g.camp.complete)E.internationalMatch(g);E.returnFromCamp(g);}else E.advance(g);}assert.ok(!['ready','callup','international'].includes(g.phase));};
 const totals=rows=>rows.reduce((a,m)=>{for(const key of ['minutes','goals','shots','onTarget','saves','facedOnTarget','conceded','passes','completed','tackles','tackleAttempts','interceptions'])a[key]=(a[key]||0)+m[key];return a;},{});
 function samples(pos,stats){let rows=[];for(let i=0;i<750;i++){const g=make(pos,2000+i);g.age=25;g.trust=95;g.form=60;g.fitness=100;g.intensity='light';for(const key of E.activeAttributes(g.player))g.player.details[key]=70;Object.assign(g.player.details,stats);E.recalc(g.player);rows.push(E.simulateAppearance(g,60,70,E.dayAt(g.clock),true));}return totals(rows);}
 test('every recorded match is internally consistent for all six positions',()=>{
