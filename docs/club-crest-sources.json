@@ -1,0 +1,475 @@
+{
+  "assets": [
+    {
+      "clubId": "EN-united",
+      "file": "football.db.logos-master/europe/en-england/manunited.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-arsenal",
+      "file": "football.db.logos-master/europe/en-england/arsenal.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-liverpool",
+      "file": "football.db.logos-master/europe/en-england/liverpool.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-leeds",
+      "file": "football-logos-master/logos/England - Premier League/Leeds United.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "EN-ipswich",
+      "file": "football-logos-master/logos/England - Premier League/Ipswich Town.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "EN-chelsea",
+      "file": "football.db.logos-master/europe/en-england/chelsea.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-sunderland",
+      "file": "football.db.logos-master/europe/en-england/sunderland.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-villa",
+      "file": "football.db.logos-master/europe/en-england/astonvilla.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-southampton",
+      "file": "football.db.logos-master/europe/en-england/southampton.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-newcastle",
+      "file": "football.db.logos-master/europe/en-england/newcastle.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-spurs",
+      "file": "football.db.logos-master/europe/en-england/tottenham.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-leicester",
+      "file": "football-logos-master/history/2021-22/England - Premier League/Leicester City.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "EN-westham",
+      "file": "football.db.logos-master/europe/en-england/westham.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-everton",
+      "file": "football.db.logos-master/europe/en-england/everton.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-city",
+      "file": "football.db.logos-master/europe/en-england/mancity.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "EN-coventry",
+      "file": "football-logos-master/logos/England - Premier League/Coventry City.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "IT-roma",
+      "file": "football.db.logos-master/europe/it-italy/roma.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-juventus",
+      "file": "football.db.logos-master/europe/it-italy/juventus.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-lazio",
+      "file": "football.db.logos-master/europe/it-italy/lazio.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-parma",
+      "file": "football.db.logos-master/europe/it-italy/parma.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-inter",
+      "file": "football.db.logos-master/europe/it-italy/internazionale.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-milan",
+      "file": "football.db.logos-master/europe/it-italy/milan.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-atalanta",
+      "file": "football.db.logos-master/europe/it-italy/atalanta.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-fiorentina",
+      "file": "football.db.logos-master/europe/it-italy/fiorentina.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-bologna",
+      "file": "football.db.logos-master/europe/it-italy/bologna.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-udinese",
+      "file": "football.db.logos-master/europe/it-italy/udinese.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-lecce",
+      "file": "football-logos-master/logos/Italy - Serie A/US Lecce.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "IT-verona",
+      "file": "football.db.logos-master/europe/it-italy/hellasverona.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "IT-napoli",
+      "file": "football.db.logos-master/europe/it-italy/napoli.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-nantes",
+      "file": "football.db.logos-master/europe/fr-france/nantes.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-lyon",
+      "file": "football.db.logos-master/europe/fr-france/lyon.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-lille",
+      "file": "football.db.logos-master/europe/fr-france/lille.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-bordeaux",
+      "file": "football.db.logos-master/europe/fr-france/bordeaux.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-rennes",
+      "file": "football.db.logos-master/europe/fr-france/rennes.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-troyes",
+      "file": "football-logos-master/logos/France - Ligue 1/ESTAC Troyes.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "FR-bastia",
+      "file": "football.db.logos-master/europe/fr-france/bastia.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-psg",
+      "file": "football.db.logos-master/europe/fr-france/paris.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-guingamp",
+      "file": "football.db.logos-master/europe/fr-france/guingamp.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-monaco",
+      "file": "football.db.logos-master/europe/fr-france/monaco.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-metz",
+      "file": "football-logos-master/history/2021-22/France - Ligue 1/FC Metz.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "FR-auxerre",
+      "file": "football-logos-master/logos/France - Ligue 1/AJ Auxerre.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "FR-lens",
+      "file": "football-logos-master/logos/France - Ligue 1/RC Lens.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "FR-marseille",
+      "file": "football.db.logos-master/europe/fr-france/marseille.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-toulouse",
+      "file": "football.db.logos-master/europe/fr-france/toulouse.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-saintetienne",
+      "file": "football.db.logos-master/europe/fr-france/saintetienne.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "FR-strasbourg",
+      "file": "football-logos-master/logos/France - Ligue 1/RC Strasbourg Alsace.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "DE-bayern",
+      "file": "football.db.logos-master/europe/de-deutschland/i-bayern.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-schalke",
+      "file": "football.db.logos-master/europe/de-deutschland/i-schalke.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-dortmund",
+      "file": "football.db.logos-master/europe/de-deutschland/i-dortmund.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-leverkusen",
+      "file": "football.db.logos-master/europe/de-deutschland/i-leverkusen.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-hertha",
+      "file": "football.db.logos-master/europe/de-deutschland/i-herthabsc.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-freiburg",
+      "file": "football.db.logos-master/europe/de-deutschland/i-freiburg.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-bremen",
+      "file": "football.db.logos-master/europe/de-deutschland/i-bremen.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-kaiserslautern",
+      "file": "football.db.logos-master/europe/de-deutschland/ii-klautern.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-wolfsburg",
+      "file": "football.db.logos-master/europe/de-deutschland/i-wolfsburg.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-koln",
+      "file": "football.db.logos-master/europe/de-deutschland/ii-koeln.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-munich1860",
+      "file": "football.db.logos-master/europe/de-deutschland/ii-tsvmuenchen.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-hamburg",
+      "file": "football.db.logos-master/europe/de-deutschland/i-hsv.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-cottbus",
+      "file": "football.db.logos-master/europe/de-deutschland/ii-cottbus.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-stuttgart",
+      "file": "football.db.logos-master/europe/de-deutschland/i-stuttgart.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-frankfurt",
+      "file": "football.db.logos-master/europe/de-deutschland/i-frankfurt.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "DE-bochum",
+      "file": "football.db.logos-master/europe/de-deutschland/ii-bochum.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-real",
+      "file": "football.db.logos-master/europe/es-espana/madrid.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-deportivo",
+      "file": "football-logos-master/logos/Spain - LaLiga/Deportivo Alavés.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "ES-mallorca",
+      "file": "football-logos-master/history/2021-22/Spain - LaLiga/RCD Mallorca.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "ES-barcelona",
+      "file": "football.db.logos-master/europe/es-espana/barcelona.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-valencia",
+      "file": "football.db.logos-master/europe/es-espana/valencia.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-celta",
+      "file": "football.db.logos-master/europe/es-espana/celta.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-villarreal",
+      "file": "football.db.logos-master/europe/es-espana/villareal.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-malaga",
+      "file": "football.db.logos-master/europe/es-espana/malaga.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-espanyol",
+      "file": "football.db.logos-master/europe/es-espana/espanyol.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-alaves",
+      "file": "football-logos-master/logos/Spain - LaLiga/Deportivo Alavés.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "ES-laspalmas",
+      "file": "football-logos-master/history/2023-24/Spain - LaLiga/UD Las Palmas.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "ES-athletic",
+      "file": "football.db.logos-master/europe/es-espana/athletic.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-sociedad",
+      "file": "football.db.logos-master/europe/es-espana/realsociedad.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-rayo",
+      "file": "football.db.logos-master/europe/es-espana/rayo.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-osasuna",
+      "file": "football.db.logos-master/europe/es-espana/osasuna.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-valladolid",
+      "file": "football.db.logos-master/europe/es-espana/valladolid.png",
+      "source": "https://github.com/sportlogos/football.db.logos"
+    },
+    {
+      "clubId": "ES-oviedo",
+      "file": "football-logos-master/history/2025-26/Spain - LaLiga/Real Oviedo.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "ES-racing",
+      "file": "football-logos-master/logos/Spain - LaLiga/Racing Santander.png",
+      "source": "https://github.com/luukhopman/football-logos"
+    },
+    {
+      "clubId": "KR-anyang-lg",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K09.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    },
+    {
+      "clubId": "KR-ulsan",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K01.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    },
+    {
+      "clubId": "KR-bucheon-sk",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K04.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    },
+    {
+      "clubId": "KR-jeonbuk",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K05.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    },
+    {
+      "clubId": "KR-daejeon",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K10.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    },
+    {
+      "clubId": "KR-pohang",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K03.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    },
+    {
+      "clubId": "SP-sangmu",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K35.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    },
+    {
+      "clubId": "KR-suwon",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K02.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    },
+    {
+      "clubId": "KR-busan",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K06.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    },
+    {
+      "clubId": "KR-seongnam",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K08.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    },
+    {
+      "clubId": "KR-jeonnam",
+      "source": "https://www.kleague.com/assets/images/emblem/emblem_K07.png",
+      "note": "current crest of successor club; not an exact 2000 badge"
+    }
+  ],
+  "gameShields": [
+    "EN-charlton",
+    "EN-middlesbrough",
+    "EN-derby",
+    "EN-bradford",
+    "IT-brescia",
+    "IT-perugia",
+    "IT-reggina",
+    "IT-vicenza",
+    "IT-bari",
+    "FR-sedan",
+    "DE-rostock",
+    "DE-unterhaching",
+    "ES-zaragoza",
+    "ES-numancia"
+  ]
+}

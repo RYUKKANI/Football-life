@@ -1,6 +1,6 @@
 {
   "name": "football-life",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "축구 생활 · Football Life, a browser football player career game",
   "scripts": {
@@ -8,5 +8,7 @@
     "check": "node scripts/check-package.cjs",
     "build": "node scripts/build-offline.cjs"
   },
-  "engines": {"node": ">=22"}
+  "engines": {
+    "node": ">=22"
+  }
 }
