@@ -28,7 +28,7 @@ function nav(){
 function header(){if(!game)return'';const p=game.player;return'<header class="player-header"><button data-action="home" class="home-button" aria-label="홈으로">⌂</button><div class="identity"><b>'+esc(p.name)+'</b><span>'+esc(E.stageName(game))+' · '+E.POS[p.pos].name+' · '+game.age+'세</span></div><div class="overall"><small>종합 능력</small><b>'+E.overall(p)+'</b></div></header><nav class="tabs" aria-label="커리어 메뉴">'+[['season','시즌'],['career','커리어'],['player','선수'],['league','리그 / 우승']].map(([id,label])=>btn(label,'tab','data-value="'+id+'"','tab '+(tab===id?'active':''))).join('')+'</nav>'}
 function home(){
  const active=game&&!game.retired;
- return '<main class="home" aria-label="축구 생활 메인"><img class="home-art" src="'+FootballHomeArt.src+'" width="'+FootballHomeArt.width+'" height="'+FootballHomeArt.height+'" alt="" aria-hidden="true" decoding="async" fetchpriority="high"><div class="home-top"><span class="home-edition">FOOTBALL LIFE<br><small>선수 커리어 게임</small></span>'+btn(menuIcon('settings'),'settings','aria-label="설정"','home-button')+'</div><div class="home-brand"><div class="brand-ball" aria-hidden="true">⚽</div><h1><span>축구</span><strong>생활</strong></h1><div class="brand-english">FOOTBALL LIFE</div></div><p class="home-story">2000년, 중3의 첫 킥오프.<br>나만의 축구 인생이 시작된다.</p><div class="home-actions">'+(active?btn('▷ '+esc(game.player.name)+'의 커리어 계속 →','hub','','big-start continue'):'')+btn('새로운 축구 인생 시작 →','new','','big-start '+(active?'secondary':''))+'<div class="home-quick">'+btn('선수 기록','archives','','quick-button')+btn('게임 안내','guide','','quick-button')+'</div>'+btn('<span>공지</span><b>커리어 · 계약 · 개인 시상</b><i aria-hidden="true">›</i>','notice','','home-notice')+'</div></main>';
+ return '<main class="home" aria-label="축구 생활 메인"><img class="home-art" src="'+FootballHomeArt.src+'" width="'+FootballHomeArt.width+'" height="'+FootballHomeArt.height+'" alt="" aria-hidden="true" decoding="async" fetchpriority="high"><div class="home-top"><span class="home-edition">FOOTBALL LIFE<br><small>선수 커리어 게임</small></span>'+btn(menuIcon('settings'),'settings','aria-label="설정"','home-button')+'</div><div class="home-brand"><h1><span>축구</span><strong>생활</strong></h1><div class="brand-english">FOOTBALL LIFE</div></div><p class="home-story">2000년, 축구 인생이 시작된다.</p><div class="home-actions">'+(active?btn('▷ '+esc(game.player.name)+'의 커리어 계속 →','hub','','big-start continue'):'')+btn('새로운 축구 인생 시작 →','new','','big-start '+(active?'secondary':''))+'<div class="home-quick">'+btn('선수 기록','archives','','quick-button')+btn('게임 안내','guide','','quick-button')+'</div>'+btn('<span>공지</span><b>커리어 · 계약 · 개인 시상</b><i aria-hidden="true">›</i>','notice','','home-notice')+'</div></main>';
 }
 function creation(){
  return '<main><header class="story-header"><div class="header-row"><div><h1>축구 생활</h1><span class="english">FOOTBALL LIFE</span></div>'+btn('홈','home','','outline light')+'</div><p>2000년, 중학교 3학년.<br>첫 유니폼을 입을 준비를 해보자.</p></header><form id="creation" class="form-card">'+title('1 / 3','선수 만들기','15세의 선수로 시작합니다.')+btn('랜덤 생성','random','','outline random')+'<div class="field-grid"><label>이름<input id="name" name="name" maxlength="16" required placeholder="선수 이름" autocomplete="off" value="'+esc(draft.name)+'"></label><label>등번호<input id="number" name="number" type="number" min="1" max="99" value="'+draft.number+'" required></label></div><fieldset><legend>주발</legend><div class="grid two">'+[['right','오른발'],['left','왼발']].map(([id,t])=>btn(t,'draft','data-key="foot" data-value="'+id+'" aria-pressed="'+(draft.foot===id)+'"','choice '+(draft.foot===id?'selected':''))).join('')+'</div><p class="help">약한 발은 소속팀 훈련으로 익힐 수 있습니다.</p></fieldset><fieldset><legend>포지션</legend><div class="grid three">'+Object.entries(E.POS).map(([id,p])=>btn(p.name+'<small>'+id+'</small>','draft','data-key="pos" data-value="'+id+'" aria-pressed="'+(draft.pos===id)+'"','choice '+(draft.pos===id?'selected':''))).join('')+'</div></fieldset><button class="primary" type="submit">다음 · 재능 후보 →</button></form></main>';
@@ -158,10 +158,10 @@ function menuIcon(id){
 }
 function settings(){
  const audio=FootballAudio.getSettings(),volume=(kind,label)=>'<div class="volume-control"><label for="'+kind+'-volume">'+label+'</label><output id="'+kind+'-volume-value" for="'+kind+'-volume">'+Math.round(audio[kind]*100)+'%</output><input id="'+kind+'-volume" type="range" min="0" max="100" step="1" value="'+Math.round(audio[kind]*100)+'" aria-label="'+label+' 음량"></div>';
- return '<main class="content settings-page">'+title('FOOTBALL LIFE','설정')+'<section class="card sound-settings"><div class="row"><h3>소리</h3>'+badge(audio.muted?'음소거':'소리 켜짐',audio.muted?'':'teal')+'</div><button class="setting-toggle" data-action="audio-mute" aria-pressed="'+audio.muted+'"><span>모든 소리 음소거</span><b>'+(audio.muted?'켜짐':'꺼짐')+'</b></button>'+volume('music','배경음')+volume('effects','버튼 효과음')+'<p class="now-playing">♪ '+esc(FootballAudio.getThemeName())+'</p><p class="help">현재 무대에 맞는 오르골 연주가 흐릅니다. 소리 설정은 이 브라우저에 저장됩니다.</p></section><section class="card"><h3>기록 보관</h3><p class="help">기록은 이 브라우저에 저장됩니다. 다른 기기나 사이트로 옮길 때는 백업 파일을 사용하세요.</p><div class="settings-actions">'+btn('기록 파일 저장','export','','outline full')+btn('기록 파일 불러오기','import','','outline full')+btn('보관 기록 관리','archives','','text-button full')+'</div></section><section class="card"><h3>화면</h3><button class="setting-toggle" data-action="toggle-motion" aria-pressed="'+reducedMotion+'"><span>움직임 줄이기</span><b>'+(reducedMotion?'켜짐':'꺼짐')+'</b></button><p class="help">화면과 버튼의 움직임을 줄입니다. 로딩 장면의 표시 시간은 유지됩니다.</p></section><section class="card"><h3>축구 생활</h3><p class="help">Football Life · 1.2.1</p>'+btn('게임 안내','guide','','outline full')+btn('업데이트 내용','notice','','text-button full')+'<details class="disclosure sources-fold"><summary>참고 자료</summary><ul>'+E.SOURCES.map(([t,u])=>'<li><a target="_blank" rel="noopener noreferrer" href="'+u+'">'+esc(t)+'</a></li>').join('')+'</ul><p class="help">플레이스타일 아이콘은 FC27 클럽 빌더의 원본을 사용했습니다. 경기·성장·이적 결과는 게임 규칙으로 계산합니다.</p></details></section></main>';
+ return '<main class="content settings-page">'+title('FOOTBALL LIFE','설정')+'<section class="card sound-settings"><div class="row"><h3>소리</h3>'+badge(audio.muted?'음소거':'소리 켜짐',audio.muted?'':'teal')+'</div><button class="setting-toggle" data-action="audio-mute" aria-pressed="'+audio.muted+'"><span>모든 소리 음소거</span><b>'+(audio.muted?'켜짐':'꺼짐')+'</b></button>'+volume('music','배경음')+volume('effects','버튼 효과음')+'<p class="now-playing">♪ '+esc(FootballAudio.getThemeName())+'</p><p class="help">현재 무대에 맞는 오르골 연주가 흐릅니다. 소리 설정은 이 브라우저에 저장됩니다.</p></section><section class="card"><h3>기록 보관</h3><p class="help">기록은 이 브라우저에 저장됩니다. 다른 기기나 사이트로 옮길 때는 백업 파일을 사용하세요.</p><div class="settings-actions">'+btn('기록 파일 저장','export','','outline full')+btn('기록 파일 불러오기','import','','outline full')+btn('보관 기록 관리','archives','','text-button full')+'</div></section><section class="card"><h3>화면</h3><button class="setting-toggle" data-action="toggle-motion" aria-pressed="'+reducedMotion+'"><span>움직임 줄이기</span><b>'+(reducedMotion?'켜짐':'꺼짐')+'</b></button><p class="help">화면과 버튼의 움직임을 줄입니다. 로딩 장면의 표시 시간은 유지됩니다.</p></section><section class="card"><h3>축구 생활</h3><p class="help">Football Life · 1.2.2</p>'+btn('게임 안내','guide','','outline full')+btn('업데이트 내용','notice','','text-button full')+'<details class="disclosure sources-fold"><summary>참고 자료</summary><ul>'+E.SOURCES.map(([t,u])=>'<li><a target="_blank" rel="noopener noreferrer" href="'+u+'">'+esc(t)+'</a></li>').join('')+'</ul><p class="help">플레이스타일 아이콘은 FC27 클럽 빌더의 원본을 사용했습니다. 경기·성장·이적 결과는 게임 규칙으로 계산합니다.</p></details></section></main>';
 }
 function showNotice(){
- dialog('업데이트 · 1.2.1','<ul><li>로딩 장면이 약 7초 동안 진행 과정을 보여줍니다. 결과 바로 보기도 사용할 수 있습니다.</li><li>버튼을 누르면 살짝 눌리는 움직임과 짧은 효과음이 나옵니다.</li><li>중학교·고등학교·국가대표·해외 구단에 서로 다른 오르골 배경음을 추가했습니다.</li><li>설정에서 전체 음소거, 배경음과 버튼 효과음의 음량을 조절할 수 있습니다.</li><li>학교 교표와 구단 엠블럼을 더 추가했습니다.</li><li>기존 커리어와 백업 기록은 그대로 이어집니다.</li></ul>');
+ dialog('업데이트 · 1.2.2','<ul><li>메인 제목과 소개 문구를 정리했습니다.</li><li>로딩 장면은 4초 동안 진행합니다. 결과 바로 보기도 사용할 수 있습니다.</li><li>선수 프로필은 처음 생성할 때와 새 시즌을 시작할 때 표시합니다.</li><li>중간 반기에는 제안을 선택하면 훈련 화면으로 바로 이어집니다.</li><li>기존 커리어와 백업 기록은 그대로 이어집니다.</li></ul>');
 }
 function confirmImport(){
  if(!pendingImport)return false;
@@ -190,10 +190,17 @@ function transaction(action){
  const before=duplicate({game,archives,legacy});let result;
  try{result=action();if(!save())throw Error('save');return result;}catch(error){game=before.game;archives=before.archives;legacy=before.legacy;toast('저장하지 못해 진행을 취소했습니다. 기록 백업으로 저장 공간을 확보해 주세요.');return null;}
 }
+function startsSeason(g){return E.date(g.clock).month===(g.stage==='pro'&&g.country!=='KR'?7:1);}
+function startPreparedPeriod(p){
+ if(!p||p.kind==='transfer'&&(!game||game.clock!==p.originClock||game.phase!=='market'))return false;
+ const done=transaction(()=>{if(p.kind==='new'&&game)archives.push(game);game=p.game;return true;});
+ if(done){pendingProfile=null;tab='season';seasonView='training';screen='hub';leagueCountry=game.country;if(p.kind==='new'||p.seasonStart)toast('시즌이 시작됐습니다.');}
+ return done;
+}
 function playScene(label,steps,finish,sceneGame=game){
  scene={label,steps,step:0,finish,game:sceneGame};render();
- const delay=Math.max(1500,Math.round(6000/steps.length));
- const tick=()=>{if(!scene)return;scene.step++;render(true);sceneTimer=setTimeout(scene.step>=scene.steps.length?finishScene:tick,scene.step>=scene.steps.length?800:delay);};
+ const delay=Math.floor(3500/steps.length),hold=4000-delay*steps.length;
+ const tick=()=>{if(!scene)return;scene.step++;render(true);sceneTimer=setTimeout(scene.step>=scene.steps.length?finishScene:tick,scene.step>=scene.steps.length?hold:delay);};
  sceneTimer=setTimeout(tick,delay);
 }
 function finishScene(){if(!scene)return;clearTimeout(sceneTimer);const finish=scene.finish;scene=null;finish?.();render();}
@@ -210,7 +217,7 @@ function profileCard(g){
 function profileScreen(){
  if(!pendingProfile){screen='hub';return hub();}
  const g=pendingProfile.game,isNew=pendingProfile.kind==='new';
- return '<main><div class="content">'+title('PLAYER PROFILE',isNew?'선수 준비 완료':pendingProfile.offerId==='stay'?'다음 반기 준비':g.loan?'임대 준비 완료':'새 유니폼을 입다','프로필을 확인하고 다음 일정을 시작하세요.')+profileCard(g)+btn(isNew?'첫 시즌 시작 →':'다음 반기 시작 →','confirm-profile')+btn('선택 다시 보기','profile-back','','outline full')+'</div></main>';
+ return '<main><div class="content">'+title('PLAYER PROFILE',isNew?'선수 준비 완료':pendingProfile.offerId==='stay'?'새 시즌 준비':g.loan?'임대 준비 완료':'새 유니폼을 입다','프로필을 확인하고 새 시즌을 시작하세요.')+profileCard(g)+btn(isNew?'첫 시즌 시작 →':'새 시즌 시작 →','confirm-profile')+btn('선택 다시 보기','profile-back','','outline full')+'</div></main>';
 }
 function clubStrip(){
  const stage=game.stage==='middle'?'U15':game.stage==='academy'?'U18':game.stage==='university'?'대학':game.stage==='semipro'?'실업':game.stage==='service'?'복무':'프로';
@@ -308,7 +315,7 @@ document.addEventListener('click',event=>{const button=event.target.closest('but
  if(a==='audio-mute'){FootballAudio.setMuted(!FootballAudio.getSettings().muted);render(true);return;}
 
  if(a==='profile-back'){screen=pendingProfile?.kind==='new'?'growth':'hub';render();return;}
- if(a==='confirm-profile'&&pendingProfile){const p=pendingProfile;if(p.kind==='transfer'&&(!game||game.clock!==p.originClock||game.phase!=='market'))return;const done=transaction(()=>{if(p.kind==='new'&&game)archives.push(game);game=p.game;return true;});if(done){pendingProfile=null;tab='season';seasonView='training';screen='hub';leagueCountry=game.country;toast('시즌이 시작됐습니다.');}render();return;}
+ if(a==='confirm-profile'&&pendingProfile){startPreparedPeriod(pendingProfile);render();return;}
  if(a==='manager'){const result=transaction(()=>E.manager(game,v));if(result)toast(result.accepted?'면담 완료 · 새 계획을 확인하세요.':'면담을 마쳤습니다.');render(true);return;}
  if(a==='negotiate-open'){negotiationForm(v);return;}
  if(a==='negotiate-submit'){const id=document.getElementById('neg-id').value,proposal={raise:Number(document.getElementById('neg-raise').value),months:Number(document.getElementById('neg-months').value),role:document.getElementById('neg-role').value};const result=transaction(()=>E.negotiate(game,id,proposal));document.getElementById('dialog').close();if(result)playScene('계약 조건 협의',['구단에 조건 전달','구단 답변 확인'],()=>dialog(result.success?'협상 성사':'조건 변경 거절','<p>'+esc(result.text)+'</p>'));return;}
@@ -362,7 +369,13 @@ document.addEventListener('click',event=>{const button=event.target.closest('but
  if(a==='advance'&&game?.phase==='ready'){const result=transaction(()=>E.advance(game));if(result!==null){tab='season';playScene(game.phase==='international'?'국가대표 소집':'반기 경기 진행',['훈련과 컨디션 확인','대회 경기 진행','반기 기록 정리'],()=>{if(game.retired)tab='season';});}return;}
  if(a==='international'){if(transaction(()=>E.internationalMatch(game))){playScene('국가대표 경기',['선발 명단 확인','경기 진행','A매치 기록 확인'],()=>{});}return;}
  if(a==='return'){E.returnFromCamp(game);save();toast('대표팀 일정을 마쳤습니다. 소속팀 진행을 이어가세요.')}
- if(a==='offer'&&game?.phase==='market'&&game.marketStep==='offers'){const next=duplicate(game);if(E.accept(next,v)){pendingProfile={kind:'transfer',game:next,originClock:game.clock,offerId:v};playScene('다음 시즌 준비',['계약과 소속팀 확인','선수 프로필 준비'],()=>{screen='profile';},next);}return;}
+ if(a==='offer'&&game?.phase==='market'&&game.marketStep==='offers'){
+  const next=duplicate(game);if(!E.accept(next,v))return;
+  const prepared={kind:'transfer',game:next,originClock:game.clock,offerId:v,seasonStart:startsSeason(next)};
+  if(prepared.seasonStart){pendingProfile=prepared;playScene('새 시즌 준비',['계약과 소속팀 확인','선수 프로필 준비'],()=>{screen='profile';},next);}
+  else{pendingProfile=null;if(startPreparedPeriod(prepared))playScene('다음 반기 준비',['계약과 소속팀 확인','훈련 일정 준비'],()=>{toast('다음 반기 훈련을 준비하세요.');});else render();}
+  return;
+ }
  if(a==='upgrade-plus'){if(!E.upgradePlus(game,v))toast('능력치와 레벨, 남은 강화 칸을 확인해 주세요.');else toast('플레이스타일+ 선택을 반영했습니다.');save();keep=true}
  if(a==='show-styles'){tab='player';playerTab='styles';screen='hub'}
  if(a==='show-plus'){tab='player';playerTab='archetype';screen='hub'}
