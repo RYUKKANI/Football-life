@@ -8,9 +8,9 @@ function setup(storage=new Map()){
  let failSave=false,now=0,nextTimer=0;const timers=new Map();
  const document={documentElement:{classList:{toggle(){}}},getElementById:id=>nodes[id]||null,querySelectorAll:()=>[],addEventListener:(type,fn)=>listeners[type]=fn,createElement:()=>({click(){}})};
  const context={document,crypto:{getRandomValues(a){a[0]=914;return a}},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>{if(failSave)throw Error('Quota test');storage.set(k,v)}},window:{scrollY:0,scrollTo(){}},console:{error:e=>errors.push(e)},setTimeout:(fn,delay)=>{timers.set(++nextTimer,{fn,at:now+delay});return nextTimer},clearTimeout:id=>timers.delete(id),Blob,URL};
- vm.createContext(context);vm.runInContext(source+';this.E=FootballEngine;this.Save=FootballSave;',context);
+ vm.createContext(context);vm.runInContext(source+';this.E=FootballEngine;this.Save=FootballSave;this.Audio=FootballAudio;',context);
  const endScene=()=>{if(nodes.app.dataset.screen==='loading')listeners.click({target:{closest:()=>({dataset:{action:'skip-scene'},disabled:false})}});};
- return {E:context.E,Save:context.Save,storage,nodes,html:()=>nodes.app.innerHTML,state:()=>JSON.parse(storage.get(STORE)||'null'),failSave:v=>{failSave=v},advanceClock(ms){const end=now+ms;for(let i=0;i<100;i++){const due=[...timers].filter(([,t])=>t.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!due)break;now=due[1].at;timers.delete(due[0]);due[1].fn();}now=end;},click(action,fields={},skip=true){listeners.click({target:{closest:()=>({dataset:{action,...fields},disabled:false})}});if(skip)endScene();assert.equal(errors.length,0,errors.map(e=>e.message).join(';'));},submit(skip=true){listeners.submit({target:{id:'creation'},preventDefault(){}});if(skip)endScene();},async import(data){listeners.change({target:{id:'backup-file',value:'file.json',files:[{size:JSON.stringify(data).length,text:async()=>JSON.stringify(data)}]}});await new Promise(setImmediate);}};
+ return {E:context.E,Save:context.Save,Audio:context.Audio,storage,nodes,html:()=>nodes.app.innerHTML,state:()=>JSON.parse(storage.get(STORE)||'null'),failSave:v=>{failSave=v},advanceClock(ms){const end=now+ms;for(let i=0;i<100;i++){const due=[...timers].filter(([,t])=>t.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!due)break;now=due[1].at;timers.delete(due[0]);due[1].fn();}now=end;},click(action,fields={},skip=true){listeners.click({target:{closest:()=>({dataset:{action,...fields},disabled:false})}});if(skip)endScene();assert.equal(errors.length,0,errors.map(e=>e.message).join(';'));},submit(skip=true){listeners.submit({target:{id:'creation'},preventDefault(){}});if(skip)endScene();},async import(data){listeners.change({target:{id:'backup-file',value:'file.json',files:[{size:JSON.stringify(data).length,text:async()=>JSON.stringify(data)}]}});await new Promise(setImmediate);}};
 }
 function start(u,pos='ST',name='테스트 선수'){u.click('new');u.nodes.name={value:name};u.nodes.number={value:'9'};u.click('draft',{key:'pos',value:pos});u.submit();u.click('growth');u.click('begin');u.click('confirm-profile');}
 test('brand and five real menu destinations work without starting a fake online feature',()=>{
@@ -66,4 +66,13 @@ test('loading lasts 6.8 seconds, keeps all steps visible, and skipping never rep
 });
 test('sound controls are available and preferences survive reopening without changing the player',()=>{
  const u=setup();start(u);const before=clone(u.state());u.click('settings');assert.match(u.html(),/배경음/);assert.match(u.html(),/버튼 효과음/);assert.match(u.html(),/id="music-volume"/);u.click('audio-mute');assert.equal(JSON.parse(u.storage.get('football-life-audio')).muted,true);assert.deepEqual(u.state(),before);const again=setup(u.storage);again.click('settings');assert.match(again.html(),/음소거/);assert.match(again.html(),/aria-pressed="true"/);
+});
+test('creating another player uses the new season and theme while preserving the current overseas career',()=>{
+ const original=setup();start(original,'GK','기존 선수');const data=clone(original.state());
+ Object.assign(data.game,{country:'FR',clubId:'FR-guingamp',stage:'pro',year:2005,age:20,clock:original.E.tick(2005,7)});
+ const u=setup(new Map([[STORE,JSON.stringify(data)]])),before=clone(u.state());assert.equal(u.Audio.getTheme(),'overseas');
+ u.click('new');u.click('confirm-new');assert.equal(u.Audio.getTheme(),'middle');u.nodes.name={value:'새로운 선수'};u.nodes.number={value:'8'};u.submit(false);
+ assert.match(u.html(),/2000 · 새로운 선수/);assert.doesNotMatch(u.html(),/2005|갱강/);assert.equal(u.Audio.getTheme(),'middle');assert.deepEqual(u.state(),before);
+ u.advanceClock(6800);u.click('growth');u.click('begin',{},false);assert.match(u.html(),/2000년/);assert.doesNotMatch(u.html(),/2005|갱강/);assert.match(u.html(),/club-crest/);assert.equal(u.Audio.getTheme(),'middle');assert.deepEqual(u.state(),before);
+ u.click('skip-scene');assert.match(u.html(),/새로운 선수/);u.click('home');assert.equal(u.Audio.getTheme(),'overseas');assert.deepEqual(u.state(),before);assert.match(u.html(),/기존 선수/);
 });
