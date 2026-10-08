@@ -6,6 +6,7 @@ const clubsFor=g=>g?.era==='legacy'?D.LEGACY_CLUBS:CLUBS;
 const school=id=>[...D.MIDDLE_SCHOOLS,...D.HIGH_SCHOOLS].find(s=>s.id===id);
 const club=(id,g)=>{const c=clubsFor(g).find(c=>c.id===id)||D.LEGACY_CLUBS.find(c=>c.id===id)||FootballCareerData.CLUBS.find(c=>c.id===id)||school(id);if(id==='SP-sangmu'&&c){const y=g?.year||2000;return {...c,name:y>=2021?'김천 상무':y>=2011?'상주 상무':y>=2003?'광주 상무 불사조':'상무 축구단'};}if(id==='SP-railway'&&c&&g?.year>=2005)return {...c,name:'대전 한국철도'};return c;};
 const career=()=>typeof FootballCareer!=='undefined'?FootballCareer:null;
+const national=()=>typeof FootballNational!=='undefined'?FootballNational:null;
 const schoolName=(s,year)=>s.id==='HS-pocheol'&&year>=2013?'포항제철고등학교':s.name;
 const academyParent=g=>{const s=school(g.clubId);return s?(s.parentId&&g.year>=s.affiliatedFrom?club(s.parentId,g):null):club(g.clubId,g)};
 const leagueName=(g,country=g.country)=>g.era==='2000'?(country==='KR'?'K리그':country==='FR'?'프랑스 1부':LEAGUES[country].league):LEAGUES[country].league;
@@ -285,10 +286,11 @@ function migrate(g){
   recalc(p);
  }
  if(career()?.migrate(g))changed=true;
+ if(national()?.migrate(g))changed=true;
  if(unused)autoGrow(g,Math.min(unused,10000));if(changed)unlock(g,false);return changed;
 }
 function blankStats(){return{apps:0,starts:0,minutes:0,goals:0,assists:0,clean:0,saves:0,tackles:0,shots:0,onTarget:0,passes:0,completed:0,keyPasses:0,dribbleAttempts:0,dribbles:0,tackleAttempts:0,interceptions:0,claims:0,conceded:0,yellow:0,red:0,injuredGames:0,suspensions:0,ratingSum:0}}
-function newPeriod(g){g.target=date(g.clock).month<7?tick(g.year,7):tick(g.year+1,1);g.period={...blankStats(),start:g.clock,end:g.target,club:teamName(g),clubId:g.clubId,stage:g.stage,country:g.country,matches:[],events:[],growth:0,startOvr:overall(g.player),trained:false,activations:{}};g.phase='ready';trainingLedger(g);g.period.weakStart=g.player.weakFoot;delete g.marketStep;delete g.pendingScouting;g.camp=null;g.offers=[];career()?.startPeriod(g);}
+function newPeriod(g){national()?.trackResidence(g);g.target=date(g.clock).month<7?tick(g.year,7):tick(g.year+1,1);g.period={...blankStats(),start:g.clock,end:g.target,club:teamName(g),clubId:g.clubId,stage:g.stage,country:g.country,matches:[],events:[],growth:0,startOvr:overall(g.player),trained:false,activations:{}};g.phase='ready';trainingLedger(g);g.period.weakStart=g.player.weakFoot;delete g.marketStep;delete g.pendingScouting;g.camp=null;g.offers=[];career()?.startPeriod(g);}
 function create(data,c,seed){
  if(!data.name.trim()||!POS[data.pos]||!['left','right'].includes(data.foot))throw Error('이름과 주발, 포지션을 확인해 주세요.');
  const aid=ARCH[data.archetypeId]?.pos.includes(data.pos)?data.archetypeId:c.archetypeId;
@@ -297,7 +299,7 @@ function create(data,c,seed){
  const origin=assignStart(seed),selectedSchool=origin.kind==='school'?school(origin.id):null;
  const g={version:2,developmentVersion:2,era:'2000',startYear:D.START_YEAR,birthYear:D.START_YEAR-15,id:'FC-'+(seed>>>0).toString(36).toUpperCase(),seed:origin.seed,clock:tick(D.START_YEAR,3),year:D.START_YEAR,age:15,stage:selectedSchool?'middle':'academy',country:origin.country,clubId:origin.id,middleSchoolId:selectedSchool?.id||null,academyStart:selectedSchool?null:D.START_YEAR,player:p,training:'balanced',intensity:'normal',form:50,morale:65,fitness:100,trust:60,reputation:0,wage:0,contract:0,income:0,history:[],champions:[],journey:[],national:[],worlds:{},trophies:[],graduationRolled:false,retired:false,youthVersion:1,youthKnockoutFrom:tick(D.START_YEAR,3),youthCups:{},startOrigin:origin};
  p.styleVersion=2;p.plusChoices=[];g.simulationVersion=3;health(g);
- career()?.initialise(g);newPeriod(g);unlock(g);return g;
+ career()?.initialise(g);national()?.initialise(g);newPeriod(g);unlock(g);return g;
 }
 function assignStart(seed){
  const rng={seed:seed>>>0},abroad=rand(rng)<D.START_ABROAD_CHANCE;
@@ -452,21 +454,9 @@ function contributed(g,w,id){return [...g.history,g.period].some(r=>r.matches.so
 function runWorld(g,w,t){if(w.complete)return;for(const f of w.fixtures)if(!f.done&&f.t<=t)runFixture(g,w,f,f.t===t);if(w.isK&&!w.split&&w.fixtures.every(f=>f.done)){w.split=true;const sorted=sortTable(w);sorted.forEach((c,i)=>w.table.find(v=>v.id===c.id).group=i<6?0:1);for(let group=0;group<2;group++){const rs=rr(sorted.slice(group*6,group*6+6).map(c=>c.id));rs.forEach((r,i)=>r.forEach(([h,a])=>w.fixtures.push({t:w.splitTimes[Math.floor(i*w.splitTimes.length/5)],h,a,r:34+i,done:false})))}}
  if(w.fixtures.every(f=>f.done)&&(!w.isK||w.split)){w.complete=true;const tab=sortTable(w);if(w.kind==='pro'){g.champions.push({season:leagueLabel(w),country:w.country,year:w.year,winner:tab[0].name,runner:tab[1].name});if(g.stage==='pro'&&g.country===w.country&&g.clubId===tab[0].id&&contributed(g,w,tab[0].id)){g.trophies.push({year:date(t).year,name:leagueName(g,w.country)+' 우승',club:teamName(g)});g.period.events.push(leagueName(g,w.country)+' 우승!')}}else if(g.stage===w.kind&&g.clubId===tab[0].id&&contributed(g,w,tab[0].id)){g.trophies.push({year:date(t).year,name:({middle:'U15 리그 우승',academy:'U18 리그 우승',university:'대학 리그 우승',semipro:'실업 리그 우승'}[w.kind]||'리그 우승'),club:teamName(g)});g.period.events.push(({middle:'U15',academy:'U18',university:'대학',semipro:'실업'}[w.kind]||'소속팀')+' 리그 우승!')}}}
 function processLeagues(g){for(const country of Object.keys(LEAGUES)){const y=leagueYear(country,g.clock);if(g.era==='2000'&&y<g.startYear)continue;const w=makeWorld(g,country,y);runWorld(g,w,g.clock);if(w.complete)career()?.awardSeason(g,w);}if(usesYouthCups(g))processYouthCups(g);else if(!['pro','service'].includes(g.stage))runWorld(g,seasonWorld(g),g.clock);for(const[id,w]of Object.entries(g.worlds))if(w.complete&&g.clock-w.end>24)delete g.worlds[id]}
-const countryOpponents=['일본','호주','이란','우즈베키스탄','사우디아라비아','이라크','미국','멕시코','포르투갈','독일'];
-function maybeCamp(g){
- if(!nationalTick(g.clock)||g.stage!=='pro'||g.age<17||overall(g.player)<69||injuryAt(g))return false;
- const chance=clamp(.18+(effective(g)-69)*.037+g.reputation*.004,.18,.92);if(rand(g)>chance)return false;
- g.phase='international';g.camp={date:g.clock,opponents:shuffle(g,countryOpponents).slice(0,2),matches:[],complete:false};return true;
-}
-function internationalMatch(g){
- if(g.phase!=='international'||g.camp.complete)return false;
- const opponent=g.camp.opponents[g.camp.matches.length],opponentPower={일본:73,호주:71,이란:73,우즈베키스탄:65,사우디아라비아:69,이라크:65,미국:74,멕시코:76,포르투갈:81,독일:84}[opponent]||72;
- const frame=simulateAppearance(g,72,opponentPower,dayAt(g.camp.date)+g.camp.matches.length*4,true,false,true),m={...frame,date:g.clock,opponent};
- g.camp.matches.push(m);
- if(m.minutes){g.national.push(m);matchDevelopment(g,m,true);g.fitness=clamp(g.fitness-9*m.minutes/90,15,100);health(g).lastMatchDay=m.matchDay;g.reputation+=.6;}
- g.camp.complete=g.camp.matches.length===2;return m;
-}
-function returnFromCamp(g){if(g.phase!=='international'||!g.camp.complete)return false;const appearances=g.camp.matches.filter(m=>m.minutes).length;g.period.events.push('대한민국 대표팀 · '+appearances+'경기 출전');g.phase='ready';return true}
+function maybeCamp(g){return national()?.maybeCamp(g)||false;}
+function internationalMatch(g){return national()?.internationalMatch(g)||false;}
+function returnFromCamp(g){return national()?.returnFromCamp(g)||false;}
 function makeOffer(g,c,kind){
  const s=school(c.id),wage=kind==='pro'?Math.round(Math.max(1800,(overall(g.player)-48)**2*(c.country==='KR'?13:65))):0;
  const name=kind==='academy'?(s?teamName({...g,clubId:s.id,stage:'academy'}):c.school?c.school+' · '+c.name+' U18':c.name+' U18'):c.name;
@@ -503,18 +493,18 @@ function advance(g){
    recover(g,dayAt(g.clock));
    if(!injuryAt(g)&&rand(g)<injuryRisk(g)*.22)injure(g,dayAt(g.clock),'훈련');
    processLeagues(g);g.lastProcessedClock=g.clock;
-   if(maybeCamp(g))return 'international';
+   if(maybeCamp(g))return 'callup';
   }
-  g.clock++;settleDevelopment(g,g.clock);sync(g);
+  g.clock++;settleDevelopment(g,g.clock);sync(g);national()?.trackResidence(g);
  }
  const p=g.period;p.end=g.clock;p.endOvr=overall(g.player);p.growth=p.endOvr-p.startOvr;p.rating=p.apps?round(p.ratingSum/p.apps):0;
  p.rank=g.stage!=='pro'&&g.youthVersion===1?null:sortTable(seasonWorld(g)).findIndex(c=>c.id===g.clubId)+1;
  p.wage=Math.round(g.wage*(g.clock-p.start)/24);g.income+=p.wage;if(g.stage==='pro'||g.loan||g.military?.status==='service')g.contract=Math.max(0,g.contract-(g.clock-p.start)/2);
- career()?.finishPeriod(g,p);updateTrainingReview(g);g.history.push(JSON.parse(JSON.stringify(p)));g.phase='market';g.marketStep='review';career()?.beforeMarket(g);offers(g);
+ career()?.finishPeriod(g,p);updateTrainingReview(g);g.history.push(JSON.parse(JSON.stringify(p)));g.phase='market';g.marketStep='review';career()?.beforeMarket(g);national()?.trackResidence(g);offers(g);
  if(g.age>=(g.player.pos==='GK'?40:38)){g.retired=true;g.phase='retired';}return g.phase;
 }
 function accept(g,id){if(g.phase!=='market')return false;const o=g.offers.find(v=>v.id===id);if(!o||o.kind==='trial')return false;if(o.kind==='loan'){if(!career()?.acceptLoan(g,o))return false;}else if(o.kind==='stay'){if(g.stage==='pro'&&!g.loan&&g.military?.status!=='service'){g.contract=o.months;g.wage=o.wage;g.contractTerms={role:o.roleId||g.contractTerms?.role||'rotation',bonus:o.bonus||0};}}else{g.clubId=o.clubId;g.country=o.country;g.stage=o.kind;g.wage=o.wage;g.contract=o.months;g.trust=55;g.contractTerms={role:o.roleId||'prospect',bonus:o.bonus||0};if(o.kind==='academy')g.academyStart=g.year;if(['university','semipro'].includes(o.kind))g.routeStart=g.year;g.journey.push({date:g.clock,clubId:o.clubId,name:o.name,kind:o.kind,wage:o.wage,rare:!!o.rare});}g.fitness=clamp(g.fitness+18,30,100);g.morale=70;newPeriod(g);return true}
 function totals(g){const result=blankStats();const rows=[...g.history];if(g.period&&g.phase!=='market'&&g.phase!=='retired')rows.push(g.period);for(const r of rows)for(const k of Object.keys(result))result[k]+=r[k]||0;result.rating=result.apps?round(result.ratingSum/result.apps):0;return result}
-function retire(g){if(g.age<30||g.phase==='international')return false;if(g.phase==='ready'&&g.period.matches.length){g.period.end=g.clock;g.history.push(JSON.parse(JSON.stringify(g.period)))}g.retired=true;g.phase='retired';return true}
+function retire(g){if(g.age<30||['callup','international'].includes(g.phase))return false;if(g.phase==='ready'&&g.period.matches.length){g.period.end=g.clock;g.history.push(JSON.parse(JSON.stringify(g.period)))}g.retired=true;g.phase='retired';return true}
 return{...D,NAMES,dayAt,fixtureDay,health,injuryAt,injuryDays,injure,settleDevelopment,simulateAppearance,matchDevelopment,developmentSummary,assignStart,usesYouthCups,youthSeason,roundName,meets,styleProgress,plusOptions,plusCapacity,upgradePlus,clubsFor,school,leagueName,activeAttributes,attributeName,growthType,agePhase,trainingOptions,normaliseFocus,clamp,round,rand,int,shuffle,tick,date,dateText,club,level,overall,effective,recalc,groupKeys,eligibleArch,candidates,makeCandidate,talent,talentBonus,growthMultiplier,injuryRisk,migrate,create,teamName,stageName,slots,availableStyles,equip,plus,effects,xp,unlock,advance,internationalMatch,returnFromCamp,accept,totals,retire,sortTable,seasonWorld,leagueLabel,makeWorld,runWorld,offers,blankStats,train,newPeriod,stableSeed,addDevelopment};
 })();

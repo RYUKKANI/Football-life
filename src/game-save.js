@@ -8,12 +8,13 @@ const FootballSave=(()=>{
   if(g.version===2){
    const E=FootballEngine,p=g.player;
    if(!p.details||typeof p.details!=='object'||Object.values(p.details).some(v=>!Number.isFinite(v)||v<0||v>100))fail();
+   if(g.nationalityVersion!==undefined&&g.nationalityVersion!==1)fail();
    try{E.migrate(g);}catch{fail();}
    if(!E.POS[p.pos]||!['left','right'].includes(p.foot)||!E.ARCH[p.archetypeId]?.pos.includes(p.pos))fail();
    if(!p.details||Object.values(E.ATTR).flatMap(a=>a.items).some(([id])=>!Number.isFinite(p.details[id])||p.details[id]<0||p.details[id]>100))fail();
    for(const id of ['potential','weakFoot','axp'])if(!Number.isFinite(p[id])||p[id]<0||p[id]>1000000)fail();
    if(!Number.isFinite(g.seed)||!Number.isFinite(g.clock)||g.clock<E.tick(1900,1)||g.clock>E.tick(2200,1)||!Number.isFinite(g.age)||g.age<10||g.age>100)fail();
-   if(!E.LEAGUES[g.country]||!['middle','academy','pro','university','semipro','service'].includes(g.stage)||!['ready','market','international','retired'].includes(g.phase))fail();
+   if(!E.LEAGUES[g.country]||!['middle','academy','pro','university','semipro','service'].includes(g.stage)||!['ready','market','callup','international','retired'].includes(g.phase))fail();
    if(!g.period||!Array.isArray(g.period.matches)||!Array.isArray(g.period.events)||!g.worlds||typeof g.worlds!=='object')fail();
    for(const key of ['national','journey','trophies','champions','offers'])if(!Array.isArray(g[key]))fail();
    for(const key of ['awards','scouting','trials'])if(!Array.isArray(g[key])||g[key].length>1000)fail();
@@ -21,7 +22,15 @@ const FootballSave=(()=>{
    if(!g.special||!Number.isFinite(g.special.used)||g.special.used<0||g.special.used>6||!Array.isArray(g.special.periods)||!g.military||!['pending','service','completed'].includes(g.military.status)||!Array.isArray(g.military.applications))fail();
    if(g.loan&&(!E.club(g.loan.parentClubId,g)||!Number.isFinite(g.loan.end)||g.loan.end<g.loan.start))fail();
    for(const s of g.scouting)if(!s.stats||!Array.isArray(s.strengths)||!Array.isArray(s.paragraphs)||!E.POS[s.pos])fail();
-   if(g.phase==='international'&&(!g.camp||!Array.isArray(g.camp.opponents)||!Array.isArray(g.camp.matches)))fail();
+   const nt=g.internationalCareer,teams=E.NATIONAL_TEAMS,levels=E.NATIONAL_LEVELS,validTeam=id=>Object.hasOwn(teams,id),validLevel=id=>Object.hasOwn(levels,id);
+   if(g.nationalityVersion!==1||!nt||!Array.isArray(nt.nationalities)||!nt.nationalities.length||nt.nationalities.length>6||new Set(nt.nationalities).size!==nt.nationalities.length||nt.nationalities.some(id=>!validTeam(id))||!nt.nationalities.includes(nt.representing)||!validTeam(nt.residenceCountry)||!Number.isFinite(nt.residenceSince)||nt.residenceSince>g.clock||nt.residenceSince<E.tick(1900,1)||typeof nt.switchUsed!=='boolean'||!Array.isArray(nt.decisions)||nt.decisions.length>5000||!Array.isArray(nt.acquired)||nt.acquired.length>5||nt.previousAssociation!==null&&!validTeam(nt.previousAssociation)||nt.lastWindow!==null&&(!Number.isFinite(nt.lastWindow)||nt.lastWindow>g.clock))fail();
+   for(const d of nt.decisions)if(!validTeam(d.country)||!validLevel(d.level)||typeof d.accepted!=='boolean'||!Number.isFinite(d.date)||d.date>g.clock)fail();
+   for(const a of nt.acquired)if(!validTeam(a.country)||!nt.nationalities.includes(a.country)||!Number.isFinite(a.date)||a.date>g.clock)fail();
+   for(const m of g.national)if(!validTeam(m.nationalCountry)||!validLevel(m.teamLevel)||!['friendly','official'].includes(m.matchType)||m.isAMatch!==(m.teamLevel==='senior'))fail();
+   if(['callup','international'].includes(g.phase)){
+    const c=g.camp;if(!c||!Array.isArray(c.opponents)||c.opponents.length!==2||c.opponents.some(n=>typeof n!=='string'||n.length>60)||!Array.isArray(c.matches)||c.matches.length>2||!validTeam(c.country)||c.country!==nt.representing||!nt.nationalities.includes(c.country)||!validLevel(c.level)||c.matchType!=='friendly'||!Number.isFinite(c.date)||c.date>g.clock||typeof c.complete!=='boolean'||c.complete!==(c.matches.length===2))fail();
+    if(!E.canRepresent(g,c.country)||g.phase==='callup'&&(c.accepted!==false||c.complete||c.matches.length)||g.phase==='international'&&c.accepted!==true)fail();
+   }
    for(const r of [...g.history,g.period])if(!Array.isArray(r.matches)||r.matches.length>300)fail();
   }else if(g.version!==1)fail();
   return g;
