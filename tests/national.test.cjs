@@ -18,7 +18,7 @@ test('age categories are explicit, and exceptional young adults can earn senior 
 test('a callup waits for a decision; declining does not create caps or reroll the same window',()=>{
  const g=called(),before=copy(E.totals(g)),clock=g.clock,seed=g.seed;assert.equal(g.phase,'callup');assert.equal(g.camp.level,'U23');assert.equal(E.internationalMatch(g),false);assert.equal(E.advance(g),false);
  assert.ok(E.respondCallup(g,false));assert.equal(g.phase,'ready');assert.equal(g.clock,clock);assert.equal(g.seed,seed);assert.equal(g.national.length,0);assert.deepEqual(copy(E.totals(g)),before);assert.equal(E.respondCallup(g,true),false);assert.equal(E.maybeCamp(g),false);
- for(let i=0;i<25&&g.phase==='ready';i++){E.advance(g);if(g.phase==='callup')E.respondCallup(g,false);}assert.equal(g.phase,'market');assert.equal(g.national.length,0);assert.ok(g.history[0].matches.length>0);
+ require('./advance-career.cjs').finish(E,g,{accept:false});assert.equal(g.phase,'market');assert.equal(g.national.length,0);assert.ok(g.history[0].matches.length>0);
 });
 test('accepted U23 results survive reload, remain deterministic and never inflate club or senior totals',()=>{
  const g=called(),clubs=copy(E.totals(g));assert.ok(E.respondCallup(g,true));assert.equal(E.respondCallup(g,true),false);const a=copy(g),b=copy(g);
@@ -38,7 +38,7 @@ test('same-country transfers keep residence; international transfers restart it'
 });
 test('a real same-country loan and automatic return keep the entire foreign residence period',()=>{
  const g=player(20,72,'FR'),start=g.internationalCareer.residenceSince;g.clock=E.tick(g.year+1,1);g.year++;g.age++;g.contract=24;g.wage=1000;g.phase='market';g.offers=[{id:'loan',kind:'loan',clubId:'FR-bordeaux',country:'FR',borrowStage:'pro',name:'보르도',months:6,wage:1000}];assert.ok(E.accept(g,'loan'));assert.equal(g.internationalCareer.residenceSince,start);
- for(let i=0;i<40&&['ready','callup','international'].includes(g.phase);i++){if(g.phase==='callup')E.respondCallup(g,false);else E.advance(g);}assert.equal(g.phase,'market');assert.equal(g.loan,null);assert.equal(g.clubId,'FR-nantes');assert.equal(g.internationalCareer.residenceSince,start);assert.ok(g.history.at(-1).matches.every(m=>m.clubId==='FR-bordeaux'));
+ require('./advance-career.cjs').finish(E,g,{accept:false});assert.equal(g.phase,'market');assert.equal(g.loan,null);assert.equal(g.clubId,'FR-nantes');assert.equal(g.internationalCareer.residenceSince,start);assert.ok(g.history.at(-1).matches.every(m=>m.clubId==='FR-bordeaux'));
 });
 test('one representative switch preserves Korean caps and generates foreign senior opponents and records',()=>{
  const g=called();playCamp(g);const old=copy(g.national);g.country='FR';g.clubId='FR-nantes';E.newPeriod(g);g.clock+=120;g.year=E.date(g.clock).year;g.age=g.year-g.birthYear;E.newPeriod(g);assert.ok(E.acquireNationality(g,'FR'));assert.ok(E.chooseRepresentative(g,'FR'));assert.equal(g.internationalCareer.switchUsed,true);assert.equal(E.chooseRepresentative(g,'KR'),false);assert.deepEqual(copy(g.national),old);

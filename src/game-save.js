@@ -9,12 +9,13 @@ const FootballSave=(()=>{
    const E=FootballEngine,p=g.player;
    if(!p.details||typeof p.details!=='object'||Object.values(p.details).some(v=>!Number.isFinite(v)||v<0||v>100))fail();
    if(g.nationalityVersion!==undefined&&g.nationalityVersion!==1)fail();
+   if(g.expansionVersion!==undefined&&g.expansionVersion!==1)fail();
    try{E.migrate(g);}catch{fail();}
    if(!E.POS[p.pos]||!['left','right'].includes(p.foot)||!E.ARCH[p.archetypeId]?.pos.includes(p.pos))fail();
    if(!p.details||Object.values(E.ATTR).flatMap(a=>a.items).some(([id])=>!Number.isFinite(p.details[id])||p.details[id]<0||p.details[id]>100))fail();
    for(const id of ['potential','weakFoot','axp'])if(!Number.isFinite(p[id])||p[id]<0||p[id]>1000000)fail();
    if(!Number.isFinite(g.seed)||!Number.isFinite(g.clock)||g.clock<E.tick(1900,1)||g.clock>E.tick(2200,1)||!Number.isFinite(g.age)||g.age<10||g.age>100)fail();
-   if(!E.LEAGUES[g.country]||!['middle','academy','pro','university','semipro','service'].includes(g.stage)||!['ready','market','callup','international','retired'].includes(g.phase))fail();
+   if(!E.LEAGUES[g.country]||!['middle','academy','pro','university','semipro','service'].includes(g.stage)||!['ready','market','callup','international','cup','rehab','retired'].includes(g.phase))fail();
    if(!g.period||!Array.isArray(g.period.matches)||!Array.isArray(g.period.events)||!g.worlds||typeof g.worlds!=='object')fail();
    for(const key of ['national','journey','trophies','champions','offers'])if(!Array.isArray(g[key]))fail();
    for(const key of ['awards','scouting','trials'])if(!Array.isArray(g[key])||g[key].length>1000)fail();
@@ -28,9 +29,10 @@ const FootballSave=(()=>{
    for(const a of nt.acquired)if(!validTeam(a.country)||!nt.nationalities.includes(a.country)||!Number.isFinite(a.date)||a.date>g.clock)fail();
    for(const m of g.national)if(!validTeam(m.nationalCountry)||!validLevel(m.teamLevel)||!['friendly','official'].includes(m.matchType)||m.isAMatch!==(m.teamLevel==='senior'))fail();
    if(['callup','international'].includes(g.phase)){
-    const c=g.camp;if(!c||!Array.isArray(c.opponents)||c.opponents.length!==2||c.opponents.some(n=>typeof n!=='string'||n.length>60)||!Array.isArray(c.matches)||c.matches.length>2||!validTeam(c.country)||c.country!==nt.representing||!nt.nationalities.includes(c.country)||!validLevel(c.level)||c.matchType!=='friendly'||!Number.isFinite(c.date)||c.date>g.clock||typeof c.complete!=='boolean'||c.complete!==(c.matches.length===2))fail();
+    const c=g.camp;if(!c||!Array.isArray(c.opponents)||(c.seriesId?c.opponents.length<1||c.opponents.length>9:c.opponents.length!==2)||c.opponents.some(n=>typeof n!=='string'||n.length>60)||!Array.isArray(c.matches)||c.matches.length>c.opponents.length||!validTeam(c.country)||c.country!==nt.representing||!nt.nationalities.includes(c.country)||!validLevel(c.level)||(c.seriesId?c.matchType!=='official':c.matchType!=='friendly')||!Number.isFinite(c.date)||c.date>g.clock||typeof c.complete!=='boolean'||c.complete!==(!c.pendingShootout&&c.matches.length===c.opponents.length))fail();
     if(!E.canRepresent(g,c.country)||g.phase==='callup'&&(c.accepted!==false||c.complete||c.matches.length)||g.phase==='international'&&c.accepted!==true)fail();
    }
+   try{FootballExpansion.validate(g);}catch{fail();}
    for(const r of [...g.history,g.period])if(!Array.isArray(r.matches)||r.matches.length>300)fail();
   }else if(g.version!==1)fail();
   return g;

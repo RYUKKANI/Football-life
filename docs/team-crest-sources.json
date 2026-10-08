@@ -360,5 +360,43 @@
       "page": "https://github.com/JoseArroyave/football-logos/blob/main/logos/spain/Real_Zaragoza.svg",
       "image": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/spain/Real_Zaragoza.svg"
     }
+  ],
+  "continentalClubs": [
+    {
+      "clubId": "AS-gamba",
+      "source": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/japan/Gamba_Osaka.svg",
+      "path": "logos/japan/Gamba_Osaka.svg",
+      "note": "Current real club emblem, not an exact 2000 badge."
+    },
+    {
+      "clubId": "AS-jubilo",
+      "source": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/japan/Jubilo_Iwata.svg",
+      "path": "logos/japan/Jubilo_Iwata.svg",
+      "note": "Current real club emblem, not an exact 2000 badge."
+    },
+    {
+      "clubId": "AS-kashima",
+      "source": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/japan/Kashima_Antlers.svg",
+      "path": "logos/japan/Kashima_Antlers.svg",
+      "note": "Current real club emblem, not an exact 2000 badge."
+    },
+    {
+      "clubId": "AS-hilal",
+      "source": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/saudi-arabia/Al_Hilal.svg",
+      "path": "logos/saudi-arabia/Al_Hilal.svg",
+      "note": "Current real club emblem, not an exact 2000 badge."
+    },
+    {
+      "clubId": "AS-ittihad",
+      "source": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/saudi-arabia/Al_Ittihad.svg",
+      "path": "logos/saudi-arabia/Al_Ittihad.svg",
+      "note": "Current real club emblem, not an exact 2000 badge."
+    },
+    {
+      "clubId": "AS-alain",
+      "source": "https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/uae/Al_Ain_FC.svg",
+      "path": "logos/uae/Al_Ain_FC.svg",
+      "note": "Current real club emblem, not an exact 2000 badge."
+    }
   ]
 }

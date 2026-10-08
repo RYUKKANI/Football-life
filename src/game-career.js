@@ -258,7 +258,7 @@ const FootballCareer=(()=>{
   }
  }
  function leagueRows(g,w){
-  ensureLeague(g,w);const ownRows=matches(g).filter(m=>m.kind==='pro'&&m.country===w.country&&m.league===E.leagueLabel(w)),own=aggregate(ownRows);
+  ensureLeague(g,w);const ownRows=matches(g).filter(m=>!m.competition&&m.kind==='pro'&&m.country===w.country&&m.league===E.leagueLabel(w)),own=aggregate(ownRows);
   return [...w.players.map(p=>({...p,rating:p.apps?round(p.ratingSum/p.apps):0})),{...own,id:'USER-'+g.id,name:g.player.name,pos:g.player.pos,clubId:ownRows.at(-1)?.clubId||g.clubId,club:ownRows.at(-1)?.club||E.teamName(g),ovr:E.overall(g.player),mine:true,facedOnTarget:ownRows.reduce((s,m)=>s+(m.facedOnTarget||0),0)}];
  }
  function rankings(g,metric='goals',world=null){

@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),E=require('
 const copy=g=>JSON.parse(JSON.stringify(g));
 const make=(pos='ST',seed=914,talent='ordinary')=>E.create({name:'신규 기능 검사',number:9,pos,foot:'right',focus:[]},E.makeCandidate(pos,seed,talent),seed);
 function pro(pos='ST',seed=914,clubId='KR-suwon',value=74){const g=make(pos,seed);g.clock=E.tick(2005,1);g.year=2005;g.age=20;g.stage='pro';g.clubId=clubId;g.country=E.club(clubId,g).country;g.wage=6000;g.contract=36;g.contractTerms={role:'rotation',bonus:.08};for(const key of E.activeAttributes(g.player))g.player.details[key]=value;E.recalc(g.player);E.newPeriod(g);return g;}
-function finish(g){for(let n=0;n<40&&['ready','callup','international'].includes(g.phase);n++){if(g.phase==='callup')E.respondCallup(g,true);else if(g.phase==='international'){while(!g.camp.complete)E.internationalMatch(g);E.returnFromCamp(g);}else E.advance(g);}assert.ok(!['ready','callup','international'].includes(g.phase));}
+const finish=g=>require('./advance-career.cjs').finish(E,g);
 test('new players have position-based correlated bodies and reproducible varied names and ability sets',()=>{
  for(const pos of Object.keys(E.POS)){const names=new Set(),heights=[];for(let i=0;i<150;i++){const c=E.makeCandidate(pos,100+i,'ordinary');const g=make(pos,100+i);assert.equal(c.height,g.player.height);assert.ok(c.height>=({ST:174,WG:164,MF:167,CB:178,FB:168,GK:180}[pos]));assert.ok(c.height<=({ST:194,WG:184,MF:188,CB:196,FB:189,GK:199}[pos]));assert.ok(c.weight>45&&c.weight<110);assert.equal(c.potential,99);assert.deepEqual(copy(c),copy(E.makeCandidate(pos,100+i,'ordinary')));heights.push(c.height);names.add(E.randomName({seed:100+i}));}assert.ok(names.size>100);assert.ok(new Set(heights).size>8);}
 });
