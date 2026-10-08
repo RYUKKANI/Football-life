@@ -43,6 +43,13 @@ test('continental entries follow saved prior-year league order rather than only 
  assert.deepEqual(copy(c.teams.filter(t=>t.country==='EN').map(t=>t.id)),copy(E.sortTable(w).slice(0,4).map(t=>t.id)));
  const old=copy(g.competitionState.qualifications);X.qualification(g,w);assert.deepEqual(copy(g.competitionState.qualifications),old);
 });
+test('European summer preparation creates the upcoming cup season in July with future fixtures',()=>{
+ const g=pro('ST',44,'EN',2005,7),seed=g.seed;
+ assert.ok(g.competitionState.clubs['DOM-EN-2005']);assert.ok(g.competitionState.clubs['EU-2005']);
+ assert.equal(g.competitionState.clubs['DOM-EN-2004'],undefined);
+ const cups=E.ensureClubCups(g);assert.equal(g.seed,seed);
+ assert.ok(cups.every(c=>c.year===2005&&c.dates[0]>g.clock));
+});
 test('cup records count once in career totals and cannot inflate league-only individual rankings',()=>{
  const g=readyCup(pro('ST',98)),x=E.cupContext(g),before=g.period.matches.length;
  let m=E.playCup(g);if(g.cupMatch.stage==='shootout')m=E.playCup(g,'auto');
@@ -153,6 +160,13 @@ test('recent five seasons use actual records and stored OVR, leaving unknown his
  g.clock=E.tick(2007,1);g.year=2007;g.age=22;g.phase='market';delete g.expansionVersion;X.migrate(g);
  const rows=E.seasonTrend(g);assert.equal(rows.length,5);assert.deepEqual(copy(rows.map(r=>r.season)),['2002','2003','2004','2005','2006']);assert.equal(rows.at(-1).ovr,66);assert.equal(rows.at(-1).apps,1);assert.equal(rows.at(-1).saveRate,70);
  assert.ok(g.seasonSnapshots.every(s=>Object.keys(s.details).length===0));const before=copy(g);E.seasonTrend(g);assert.deepEqual(copy(g),before);
+});
+test('season comparison preserves the precise appearance-weighted rating shown in career records',()=>{
+ const g=pro('GK',45),start=g.clock;
+ const match={...E.blankStats(),date:start,kind:'pro',country:'KR',league:'2005',clubId:g.clubId,club:'수원',minutes:90,started:true};
+ g.period.matches=[{...match,rating:6.5},{...match,rating:6.6},{...match,rating:6.6},{...match,minutes:0,started:false,rating:0}];
+ const before=copy(g),row=E.seasonTrend(g).at(-1);
+ assert.equal(row.apps,3);assert.equal(row.rating.toFixed(2),'6.57');assert.equal(row.rating,row.ratingSum/row.apps);assert.deepEqual(copy(g),before);
 });
 test('portable backups reject invalid pending competition choices without weakening legacy migration',()=>{
  const g=readyCup(pro('CB',47));assert.ok(backup(g));

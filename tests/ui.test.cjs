@@ -132,6 +132,16 @@ test('coaching, offer comparison and season graphs are readable and inspection p
  const before=clone(u.state());u.click('tab',{value:'career'});u.click('trend-open');assert.match(u.html(),/최근 5시즌 비교/);assert.deepEqual(u.state(),before);u.click('trend-back');assert.deepEqual(u.state(),before);
  require('./advance-career.cjs').finish(E,g,{accept:false});g.marketStep='offers';const offers=setup(nationalStorage(g));offers.click('hub');assert.match(offers.html(),/이적 제안 비교|예상 출전|경쟁 기량|성장 \+/);assert.doesNotMatch(offers.html(),/반기 기록/);
 });
+test('professional and university fixture views show the upcoming league without changing records or the next result',()=>{
+ for(const country of ['KR','FR']){
+  const {E,g}=nationalPlayer(20,country,78);if(country==='FR'){g.clock=E.tick(2005,7);E.newPeriod(g);delete g.competitionState.clubs['DOM-FR-2005'];delete g.competitionState.clubs['EU-2005'];}
+  const u=setup(nationalStorage(g));u.click('hub');const before=clone(u.state());
+  u.click('season-view',{value:'schedule'});assert.match(u.html(),/리그 일정|남은 리그 일정/);assert.match(u.html(),/클럽 컵대회/);assert.doesNotMatch(u.html(),/소속팀 훈련|다음 플레이스타일/);
+  if(country==='FR'){const html=u.html().replace(/src="data:[^"]+"/g,'src="crest"');assert.match(html,/2005\/06/);assert.match(html,/34경기 남음/);assert.match(html,/2005년 8월 상순/);assert.match(html,/쿠프 드 프랑스 · 2005 출전 예정/);assert.doesNotMatch(html,/쿠프 드 프랑스 · 2004/);}
+  assert.deepEqual(u.state(),before);u.click('season-view',{value:'role'});u.click('season-view',{value:'schedule'});assert.deepEqual(u.state(),before);
+ }
+ const {E,g}=nationalPlayer(20,'KR',65);g.stage='university';g.clubId='UNI-yonsei';E.newPeriod(g);const u=setup(nationalStorage(g));u.click('hub');const before=clone(u.state());u.click('season-view',{value:'schedule'});assert.match(u.html(),/리그 일정/);assert.doesNotMatch(u.html(),/클럽 컵대회/);assert.deepEqual(u.state(),before);
+});
 test('official finals expose one important-match choice at a time and keep caps through completion and reload',()=>{
  const {E,g}=nationalPlayer(21,'KR',96);g.clock=E.tick(2006,6,1);E.newPeriod(g);const def={...E.nationalDefinitions(2006).find(d=>d.kind==='world'),year:2006};
  const q=E.nationalTournament(g,def,true);q.complete=true;q.qualified=true;const c=E.nationalTournament(g,def,false);for(const t of [...c.teams,...c.table])t.power=t.id==='KR'?95:35;
