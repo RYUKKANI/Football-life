@@ -1,0 +1,58 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),E=require('./load-engine.cjs')();
+const copy=g=>JSON.parse(JSON.stringify(g));
+const make=(pos='ST',seed=914,talent='ordinary')=>E.create({name:'신규 기능 검사',number:9,pos,foot:'right',focus:[]},E.makeCandidate(pos,seed,talent),seed);
+function pro(pos='ST',seed=914,clubId='KR-suwon',value=74){const g=make(pos,seed);g.clock=E.tick(2005,1);g.year=2005;g.age=20;g.stage='pro';g.clubId=clubId;g.country=E.club(clubId,g).country;g.wage=6000;g.contract=36;g.contractTerms={role:'rotation',bonus:.08};for(const key of E.activeAttributes(g.player))g.player.details[key]=value;E.recalc(g.player);E.newPeriod(g);return g;}
+function finish(g){for(let n=0;n<30&&['ready','international'].includes(g.phase);n++){if(g.phase==='international'){while(!g.camp.complete)E.internationalMatch(g);E.returnFromCamp(g);}else E.advance(g);}assert.ok(!['ready','international'].includes(g.phase));}
+test('new players have position-based correlated bodies and reproducible varied names and ability sets',()=>{
+ for(const pos of Object.keys(E.POS)){const names=new Set(),heights=[];for(let i=0;i<150;i++){const c=E.makeCandidate(pos,100+i,'ordinary');const g=make(pos,100+i);assert.equal(c.height,g.player.height);assert.ok(c.height>=({ST:174,WG:164,MF:167,CB:178,FB:168,GK:180}[pos]));assert.ok(c.height<=({ST:194,WG:184,MF:188,CB:196,FB:189,GK:199}[pos]));assert.ok(c.weight>45&&c.weight<110);assert.equal(c.potential,99);assert.deepEqual(copy(c),copy(E.makeCandidate(pos,100+i,'ordinary')));heights.push(c.height);names.add(E.randomName({seed:100+i}));}assert.ok(names.size>100);assert.ok(new Set(heights).size>8);}
+});
+test('calm talent improves composure and the correct core attribute in all six positions',()=>{
+ for(const pos of Object.keys(E.POS)){const a=E.makeCandidate(pos,78,'ordinary'),b=E.makeCandidate(pos,78,'calm');const target=pos==='GK'?'gkPosition':['CB','FB'].includes(pos)?'tackle':'finishing';assert.ok(Math.abs((b.details.composure-a.details.composure)-4)<.001);assert.ok(Math.abs((b.details[target]-a.details[target])-4)<.001);}
+});
+test('universal 99 limit slows positive growth above 90, while club facilities increase healthy training',()=>{
+ const a=pro(),b=copy(a);for(const id of E.activeAttributes(b.player))b.player.details[id]=95;const beforeA=a.player.details.finishing,beforeB=b.player.details.finishing;E.addDevelopment(a,'finishing',1,'training');E.addDevelopment(b,'finishing',1,'training');assert.ok(a.player.details.finishing-beforeA>b.player.details.finishing-beforeB);b.player.details.finishing=98.99;E.addDevelopment(b,'finishing',5,'training');assert.equal(b.player.details.finishing,99);
+ const small=pro('ST',7,'KR-daejeon',60),large=copy(small);large.clubId='EN-united';large.country='EN';E.newPeriod(large);assert.ok(E.environment(large).bonus>E.environment(small).bonus);const t=small.clock+4;E.settleDevelopment(small,t);E.settleDevelopment(large,t);assert.ok(large.player.details.finishing>small.player.details.finishing);
+});
+test('manager promises change role and actual selection odds; objectives reward trust and account for injury exposure',()=>{
+ const a=pro('CB'),oldTrust=a.trust;assert.ok(E.manager(a,'minutes').accepted);assert.equal(a.period.role,'starter');assert.equal(E.manager(a,'rest'),null);assert.ok(a.trust>oldTrust);const low=pro('CB',8,'KR-suwon',45);assert.equal(E.manager(low,'minutes').accepted,false);assert.equal(low.period.role,'rotation');
+ const g=pro('CB',9);g.period.objectives.forEach(o=>g.period[o.id]=1000);g.period.minutes=1000;g.period.tackles=100;g.period.interceptions=100;g.period.development.injuredDays=50;finish(g);const p=g.history.at(-1);assert.ok(p.objectives.some(o=>o.adjusted));assert.ok(p.objectives.every(o=>o.met));assert.ok(g.trust>=66);assert.ok(p.reactions.length>0&&p.reactions.length<=3);
+});
+test('contract proposals are once per offer, preserve original terms on failure, and persist deterministic answers',()=>{
+ let success=null,failure=null;for(let seed=1;seed<25&&(!success||!failure);seed++){const g=pro('MF',seed),o={id:'stay',kind:'stay',wage:6000,months:24};g.phase='market';g.offers=[o];const twin=copy(g),result=E.negotiate(g,'stay',{raise:20,months:48,role:'starter'});assert.deepEqual(copy(result),copy(E.negotiate(twin,'stay',{raise:20,months:48,role:'starter'})));assert.equal(E.negotiate(g,'stay',{raise:10,months:24,role:'prospect'}),null);if(result.success){success=g;assert.equal(o.wage,7200);assert.equal(o.months,48);assert.equal(o.bonus,.08);}else{failure=g;assert.equal(o.wage,6000);assert.equal(o.months,24);assert.equal(g.trust,57);}}
+ assert.ok(success&&failure);assert.ok(E.accept(success,'stay'));assert.equal(success.contractTerms.role,'starter');assert.equal(success.wage,7200);
+});
+test('loans keep parent ownership, pay and contract, give borrowed-club matches, and return once at the saved end date',()=>{
+ const g=pro('ST',18),parent=g.clubId;g.phase='market';g.offers=[{id:'loan',kind:'loan',clubId:'SP-gangneung',country:'KR',borrowStage:'semipro',name:'강릉시청',months:6,wage:g.wage}];assert.ok(E.accept(g,'loan'));assert.equal(g.stage,'semipro');assert.equal(g.loan.parentClubId,parent);assert.equal(g.contract,36);assert.equal(g.wage,6000);finish(g);assert.equal(g.clubId,parent);assert.equal(g.loan,null);assert.equal(g.contract,30);assert.ok(g.history.at(-1).matches.length);assert.ok(g.history.at(-1).matches.every(m=>m.clubId==='SP-gangneung'));assert.equal(g.journey.filter(j=>j.kind==='loan-return').length,1);assert.ok(g.history.at(-1).events.some(t=>t.includes('임대 종료')));assert.ok(g.offers.some(o=>o.kind==='pro'));
+});
+test('graduate pathways include universities and semi-pro teams; a university route ends after four years',()=>{
+ const g=make();g.stage='academy';g.academyStart=2001;g.clock=E.tick(2004,1);g.year=2004;g.age=19;g.clubId='HS-suwongong';g.phase='market';E.offers(g);assert.ok(g.offers.some(o=>o.kind==='university'));assert.ok(g.offers.some(o=>o.kind==='semipro'));const offer=g.offers.find(o=>o.kind==='university');assert.ok(E.accept(g,offer.id));assert.equal(g.routeStart,2004);assert.equal(E.usesYouthCups(g),false);const world=E.seasonWorld(g);assert.equal(world.teams.length,6);
+ g.year=2008;g.clock=E.tick(2008,1);g.age=23;g.phase='market';E.offers(g);assert.ok(g.offers.every(o=>o.id!=='stay'));assert.ok(g.offers.some(o=>o.kind==='pro'));
+});
+test('overseas trial evaluates the current player, only runs once, and produces a playable contract on success',()=>{
+ const g=pro('WG',8,'KR-daejeon',84);g.stage='semipro';g.clubId='SP-gangneung';g.phase='market';g.offers=[{id:'trial',kind:'trial',clubId:'EN-bradford',country:'EN'}];const result=E.trial(g,'trial');assert.ok(result.passed);assert.equal(g.offers[0].kind,'pro');assert.equal(E.trial(g,'trial'),null);assert.ok(E.accept(g,'trial'));assert.equal(g.country,'EN');assert.equal(g.stage,'pro');
+});
+test('special training is optional, consumed on start, cannot be repeated or used to bypass ageing and the 90 slowdown',()=>{
+ const g=pro('GK');const before=g.player.details.reflexes;assert.ok(E.startSpecial(g,'reflex'));const saved=copy(g),result=E.finishSpecial(saved,1);assert.ok(result.gain>0);assert.ok(saved.player.details.reflexes>before);assert.equal(E.finishSpecial(saved,1),null);assert.equal(E.startSpecial(saved,'reflex'),null);assert.equal(saved.special.used,1);
+ const old=pro('CB',8);old.age=35;const value=old.player.details.finishing;assert.ok(E.startSpecial(old,'shoot'));assert.equal(E.finishSpecial(old,1).gain,0);assert.equal(old.player.details.finishing,value);
+ const cap=pro();cap.special.used=6;assert.equal(E.startSpecial(cap,'mentor'),null);
+});
+test('regular service has no club appearances, advances 18 game months and returns to the parent',()=>{
+ const g=pro('CB',18),parent=g.clubId;const result=E.enlist(g,'regular');assert.ok(result.passed);assert.equal(g.stage,'service');assert.equal(E.canMilitary(g),false);for(let i=0;i<3;i++){finish(g);assert.equal(g.history.at(-1).apps,0);assert.equal(g.history.at(-1).matches.length,0);if(i<2)assert.ok(E.accept(g,'stay'));}assert.equal(g.clubId,parent);assert.equal(g.stage,'pro');assert.equal(g.military.status,'completed');assert.equal(g.contract,18);assert.equal(g.journey.filter(j=>j.kind==='military-return').length,1);
+});
+test('Sangmu selection accepts strong players, rejects weak players without repeat applications and uses era names',()=>{
+ const strong=pro('GK',18,'KR-suwon',90),weak=pro('GK',19,'KR-suwon',40);assert.ok(E.enlist(strong,'sangmu').passed);assert.equal(strong.clubId,'SP-sangmu');assert.match(E.teamName(strong),/광주 상무/);const failure=E.enlist(weak,'sangmu');assert.equal(failure.passed,false);assert.equal(E.enlist(weak,'sangmu'),null);assert.equal(weak.stage,'pro');assert.ok(E.enlist(weak,'regular').passed);assert.match(E.club('SP-sangmu',{year:2022}).name,/김천/);
+});
+test('NPC league scoring shares existing team results; own rankings reflect actual recorded matches without consuming the live RNG',()=>{
+ const g=pro('ST',8,'KR-daejeon',75);finish(g);const seed=g.seed,w=E.seasonWorld(g,g.country,'pro'),rank=E.rankings(g,'goals',w),actual=E.careerMatches(g).filter(m=>m.league===E.leagueLabel(w)&&m.kind==='pro').reduce((n,m)=>n+m.goals,0);assert.equal(rank.mine.value,actual);assert.equal(g.seed,seed);for(const c of w.table){const own=E.careerMatches(g).filter(m=>m.league===E.leagueLabel(w)&&m.clubId===c.id).reduce((n,m)=>n+m.goals,0);assert.equal(w.players.filter(p=>p.clubId===c.id).reduce((n,p)=>n+p.goals,0)+own,c.gf);}
+ assert.deepEqual(copy(rank),copy(E.rankings(copy(g),'goals')));const keeper=E.rankings(g,'saveRate',w);assert.ok(keeper.rows.every(p=>p.pos==='GK'&&p.minutes>=keeper.minimum&&Number.isFinite(p.value)&&p.value>=0&&p.value<=100));
+});
+test('annual scouting is recorded once, survives reload, and new periods do not repeat the old notification',()=>{
+ const g=make('GK',44);finish(g);assert.equal(g.scouting.length,0);E.accept(g,'stay');finish(g);assert.equal(g.scouting.length,1);const s=g.scouting[0];assert.equal(s.stats.apps,E.totals(g).apps);assert.ok(s.paragraphs[1].includes(String(s.stats.saves)));assert.equal(copy(g).pendingScouting,s.id);const offer=g.offers.find(o=>o.kind==='academy');assert.ok(E.accept(g,offer.id));assert.equal(g.pendingScouting,undefined);assert.equal(g.scouting.length,1);
+});
+test('position-aware legacy cards include all stages, prime ability and personal honours',()=>{
+ for(const pos of Object.keys(E.POS)){const g=make(pos);finish(g);E.retire(g);const l=E.legacy(g);assert.equal(l.stats.apps,E.totals(g).apps);assert.ok(l.score>=0&&Number.isFinite(l.score));assert.equal(l.prime.ovr,g.prime.ovr);assert.ok(l.caption.length);}
+});
+test('migration of an in-progress trained save fills roles without replaying training or altering recorded history',()=>{
+ const g=make('GK');E.train(g);delete g.careerVersion;delete g.awards;delete g.player.height;delete g.player.weight;delete g.period.role;delete g.period.objectives;const history=JSON.stringify(g.history),details=JSON.stringify(g.player.details),seed=g.seed;assert.ok(E.migrate(g));assert.ok(g.period.role);assert.deepEqual(copy(g.period.objectives),[]);assert.equal(JSON.stringify(g.history),history);assert.equal(JSON.stringify(g.player.details),details);assert.equal(g.seed,seed);assert.equal(E.migrate(g),false);
+});
