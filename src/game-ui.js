@@ -207,7 +207,7 @@ function profileCard(g){
 function profileScreen(){
  if(!pendingProfile){screen='hub';return hub();}
  const g=pendingProfile.game,isNew=pendingProfile.kind==='new';
- return '<main><div class="content">'+title('PLAYER PROFILE',isNew?'선수 준비 완료':g.loan?'임대 준비 완료':'새 유니폼을 입다','프로필을 확인하고 다음 시즌을 시작하세요.')+profileCard(g)+btn(isNew?'첫 시즌 시작 →':'다음 반기 시작 →','confirm-profile')+btn('선택 다시 보기','profile-back','','outline full')+'</div></main>';
+ return '<main><div class="content">'+title('PLAYER PROFILE',isNew?'선수 준비 완료':pendingProfile.offerId==='stay'?'다음 반기 준비':g.loan?'임대 준비 완료':'새 유니폼을 입다','프로필을 확인하고 다음 일정을 시작하세요.')+profileCard(g)+btn(isNew?'첫 시즌 시작 →':'다음 반기 시작 →','confirm-profile')+btn('선택 다시 보기','profile-back','','outline full')+'</div></main>';
 }
 function clubStrip(){
  const stage=game.stage==='middle'?'U15':game.stage==='academy'?'U18':game.stage==='university'?'대학':game.stage==='semipro'?'실업':game.stage==='service'?'복무':'프로';
@@ -275,7 +275,7 @@ function honourPanel(){
 function season(){
  if(game.phase==='international')return international();if(game.phase==='market')return market();
  if(game.retired)return title('END OF CAREER','마지막 휘슬',game.player.name+'의 축구 인생을 기록합니다.')+legacyCard(game)+btn('전체 커리어 기록','tab','data-value="career"','outline full')+btn('새로운 인생 시작','new');
- const mainView=['special','military'].includes(seasonView)?'role':seasonView,panes=[['training','훈련'],['role','역할 / 목표'],['schedule','일정'],['traits','특성']];
+ const mainView=seasonView==='special'?'training':seasonView==='military'?'role':seasonView,panes=[['training','훈련'],['role','역할 / 목표'],['schedule','일정'],['traits','특성']];
  const subnav='<nav class="season-subtabs" aria-label="시즌 화면 선택">'+panes.map(([id,name])=>btn(name,'season-view','data-value="'+id+'" aria-pressed="'+(mainView===id)+'"','filter '+(mainView===id?'active':''))).join('')+'</nav>';
  let content;
  if(game.stage==='service'||seasonView==='military')content=militaryPanel();

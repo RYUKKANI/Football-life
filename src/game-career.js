@@ -211,9 +211,9 @@ const FootballCareer=(()=>{
   const before=period.startDetails||period.development?.before||{},progress=core.map(id=>[id,round(p.details[id]-(before[id]??p.details[id]))]).sort((a,b)=>b[1]-a[1])[0];
   const line=p.pos==='GK'?stats.saves+'개의 선방과 '+stats.clean+'경기 무실점을 기록했습니다.':p.pos==='CB'||p.pos==='FB'?'태클 '+stats.tackles+'회와 가로채기 '+stats.interceptions+'회를 기록했습니다.':p.pos==='MF'?'득점 기회를 '+stats.keyPasses+'번 만들고 '+stats.assists+'개의 도움을 기록했습니다.':stats.goals+'골 '+stats.assists+'도움으로 공격에 기여했습니다.';
   const report={id,season,date:g.clock,name:p.name,pos:p.pos,height:p.height,weight:p.weight,club:period.club,clubId:period.clubId,stats,ovr:E.overall(p),strengths:strengths.map(id=>({id,value:Math.floor(p.details[id])})),weakest,paragraphs:[
-   p.height+'cm, '+p.weight+'kg의 '+E.POS[p.pos].name+'입니다. '+strengths.slice(0,2).map(E.attributeName).join('과 ')+'에서 강점을 보입니다.',
+   p.height+'cm, '+p.weight+'kg의 '+E.POS[p.pos].name+'입니다. 핵심 강점은 '+strengths.slice(0,2).map(E.attributeName).join(' / ')+'입니다.',
    stats.apps?'이번 시즌 '+stats.apps+'경기, '+stats.minutes+'분을 뛰었습니다. '+line+' 평균 평점은 '+stats.rating.toFixed(2)+'입니다.':'이번 시즌은 출전 기록이 없습니다. 훈련에서 쌓은 기량을 경기에서 보여줄 기회를 확보해야 합니다.',
-   (progress?.[1]>0?E.attributeName(progress[0])+'이 이번 반기에 '+progress[1]+' 올랐습니다. ':'')+E.attributeName(weakest)+'을 보완하면 현재 역할을 더 안정적으로 수행할 수 있습니다. '+(g.age>=30?'피지컬 유지와 판단 훈련을 함께 가져가는 편이 좋습니다.':g.age<=21?'신체 성장기에 맞춰 기초 체력과 포지션 기술을 함께 다듬을 시기입니다.':'발밑 기술과 경기 판단을 꾸준히 다듬을 시기입니다.')
+   (progress?.[1]>0?'이번 반기 '+E.attributeName(progress[0])+' 능력이 '+progress[1]+' 올랐습니다. ':'')+E.attributeName(weakest)+' 능력을 보완하면 현재 역할을 더 안정적으로 수행할 수 있습니다. '+(g.age>=30?'피지컬 유지와 판단 훈련을 함께 가져가는 편이 좋습니다.':g.age<=21?'신체 성장기에 맞춰 기초 체력과 포지션 기술을 함께 다듬을 시기입니다.':'발밑 기술과 경기 판단을 꾸준히 다듬을 시기입니다.')
   ]};g.scouting.push(report);g.pendingScouting=id;return report;
  }
  function aggregate(rows){
