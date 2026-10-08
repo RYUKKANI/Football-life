@@ -28,7 +28,7 @@ const FootballExpansion=(()=>{
   return [...map.values()].sort((a,b)=>a.start-b.start).slice(-5).map(s=>{
    const shots=s.matches.reduce((n,m)=>n+(m.facedOnTarget||0),0),snap=g.seasonSnapshots.find(x=>x.key===s.key),stats=E.aggregate(s.matches);
    const current=!['market','retired'].includes(g.phase)&&s.matches.some(m=>m.date>=g.period.start);
-   return {key:s.key,season:s.season,country:s.country,stage:s.stage,start:s.start,...stats,ovr:current?E.overall(g.player):snap?.endOvr??null,saveRate:shots?Math.round(stats.saves/shots*1000)/10:null};
+   return {key:s.key,season:s.season,country:s.country,stage:s.stage,start:s.start,...stats,rating:stats.apps?stats.ratingSum/stats.apps:0,ovr:current?E.overall(g.player):snap?.endOvr??null,saveRate:shots?Math.round(stats.saves/shots*1000)/10:null};
   });
  }
  function coaching(g,id=g.clubId){const c=E.club(id,g),r=rng('coach-'+id),tactic=['defense','balanced','team','attack'][E.int(r,0,3)];return {tactic,name:E.TACTICS[tactic].name,formation:{defense:'5-3-2',balanced:'4-4-2',team:'4-3-3',attack:'4-2-3-1'}[tactic],power:c?.power||48};}
