@@ -19,3 +19,9 @@
 [FC27 클럽 빌더](https://fc27builderbuilder.pages.dev/)의 아키타입 이름, 기본 플레이스타일 조건, 전문화 경로를 참고했습니다. 이 게임은 패스·드리블 등 통합 능력치를 사용하므로 원래 세부 조건을 대응시키고, 같은 능력으로 합쳐지는 조건은 높은 기준을 적용합니다.
 
 경기 행동 계산, 종합 능력 비중, 성장·부상·감소, 플레이스타일 효과와 강화 칸, 계약 결과는 축구 생활 자체 규칙입니다. 실제 FC 시리즈의 커리어 모드 계산식과 같다는 의미는 아닙니다.
+
+## 구단 엠블럼과 추가 진로
+
+구단 엠블럼 91개는 [K리그 공식 사이트](https://www.kleague.com/about/emblem.do), [football.db.logos](https://github.com/sportlogos/football.db.logos), [football-logos](https://github.com/luukhopman/football-logos)에서 제공하는 이미지를 그대로 저장했습니다. 원본 경로는 club-crest-sources.json에 기록합니다. 구단 표장은 각 구단 소유입니다. 국내 구단에는 현재 후신 구단의 엠블럼이 포함되어 정확한 2000년 엠블럼을 재현하지 않습니다. 자료가 없는 학교·대학·실업팀과 역사 구단 14곳에는 게임용 방패 표식을 사용합니다.
+
+대학 축구부 이름은 [대한축구협회 대학 축구 자료](https://www.kfa.or.kr/layer_popup/popup_live.php?act=news_tv_detail&div_code=news&idx=3744)를 참고했습니다. 상무 명칭은 [김천상무 구단 소개](https://www.gimcheonfc.com/stm/stm.php)를 참고합니다. 대학·실업팀 일정, 시설 등급, 임대·입단 테스트·복무 평가는 자체 게임 규칙입니다.
