@@ -1,9 +1,10 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-const scripts=[...html.matchAll(/<script src="([^"]+)" defer>/g)].map(m=>m[1]);
+const localPath=url=>url.split(/[?#]/)[0];
+const scripts=[...html.matchAll(/<script src="([^"]+)" defer>/g)].map(m=>localPath(m[1]));
 for(const file of scripts){assert.ok(fs.existsSync(path.join(root,file)),file);new vm.Script(fs.readFileSync(path.join(root,file),'utf8'),{filename:file});}
-for(const match of html.matchAll(/(?:src|href)="([^"#]+)"/g))assert.ok(fs.existsSync(path.join(root,match[1])),match[1]);
+for(const match of html.matchAll(/(?:src|href)="([^"#]+)"/g))assert.ok(fs.existsSync(path.join(root,localPath(match[1]))),match[1]);
 assert.equal(scripts.length,8);assert.ok(scripts.indexOf('src/game-engine.js')<scripts.indexOf('src/game-save.js'));
 assert.ok(html.includes('<title>축구 생활 · Football Life</title>'));assert.ok(html.includes('id="backup-file"'));
 const png=fs.readFileSync(path.join(root,'assets/home-cover.png'));assert.equal(png.readUInt32BE(16),1024);assert.equal(png.readUInt32BE(20),1536);

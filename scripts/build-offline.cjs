@@ -2,8 +2,9 @@
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-html=html.replace(/<link rel="stylesheet" href="([^"]+)">/g,(_,file)=>'<style>'+fs.readFileSync(path.join(root,file),'utf8')+'</style>');
+html=html.replace(/<link rel="stylesheet" href="([^"]+)">/g,(_,file)=>'<style>'+fs.readFileSync(path.join(root,file.split(/[?#]/)[0]),'utf8')+'</style>');
 html=html.replace(/<script src="([^"]+)" defer><\/script>/g,(_,file)=>{
+ file=file.split(/[?#]/)[0];
  let code=fs.readFileSync(path.join(root,file),'utf8');
  if(file==='src/home-art.js')code="const FootballHomeArt={src:'data:image/png;base64,"+fs.readFileSync(path.join(root,'assets/home-cover.png')).toString('base64')+"',width:1024,height:1536};";
  return '<script>'+code.replace(/<\/script/gi,'<\\/script')+'</script>';
