@@ -36,8 +36,8 @@ const FootballNational=(()=>{
  }
  function canRepresent(g,country){
   const s=g.internationalCareer;if(!Object.hasOwn(TEAMS,country)||!s.nationalities.includes(country))return false;
-  // This mode schedules friendlies; an official cap in an imported future record remains binding.
-  if((g.national||[]).some(m=>m.minutes>0&&m.matchType==='official'&&m.nationalCountry!==country))return false;
+  // An official senior appearance binds the association. Youth caps allow one later switch.
+  if((g.national||[]).some(m=>m.minutes>0&&m.matchType==='official'&&(!m.teamLevel||m.teamLevel==='senior')&&m.nationalCountry!==country))return false;
   if(country===s.representing)return true;
   return !s.switchUsed;
  }
@@ -52,6 +52,7 @@ const FootballNational=(()=>{
   return g.age<=17?'U17':g.age<=20?'U20':g.age<=23?'U23':'senior';
  }
  function maybeCamp(g){
+  if(typeof FootballExpansion!=='undefined'&&FootballExpansion.maybeNationalCamp(g))return true;
   if(g.phase!=='ready'||g.retired||g.stage==='service'||g.age<15||E.injuryAt(g)||![3,6,9,10,11].includes(E.date(g.clock).month)||E.date(g.clock).half!==1)return false;
   const s=g.internationalCareer;if(s.lastWindow===g.clock)return false;s.lastWindow=g.clock;
   const country=s.representing;if(!canRepresent(g,country))return false;
@@ -63,9 +64,10 @@ const FootballNational=(()=>{
  function respondCallup(g,accept){
   if(g.phase!=='callup'||!g.camp||g.camp.accepted||g.camp.declined||typeof accept!=='boolean')return false;
   const c=g.camp;c.accepted=accept;c.declined=!accept;g.internationalCareer.decisions.push({date:c.date,country:c.country,level:c.level,accepted:accept});
-  g.period.events.push(label(c.country,c.level)+' 소집 '+(accept?'수락':'거절'));g.phase=accept?'international':'ready';return true;
+  g.period.events.push(label(c.country,c.level)+' 소집 '+(accept?'수락':'거절'));g.phase=accept?'international':'ready';if(!accept&&typeof FootballExpansion!=='undefined')FootballExpansion.declinedNational(g,c);return true;
  }
- function internationalMatch(g){
+ function internationalMatch(g,choice='auto'){
+  if(g.camp?.seriesId&&typeof FootballExpansion!=='undefined')return FootballExpansion.playNational(g,choice);
   if(g.phase!=='international'||!g.camp||g.camp.complete)return false;
   const c=g.camp;if(!c.country){c.country='KR';c.level='senior';c.matchType='friendly';c.accepted=true;}
   const opponent=c.opponents[c.matches.length],offset=LEVELS[c.level].offset,opponentPower=(OPPONENTS.find(o=>o.name===opponent)?.power||72)+offset;
