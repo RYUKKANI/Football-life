@@ -4,7 +4,7 @@
 
 ## 플레이
 
-GitHub Pages 공개 주소: [축구 생활](https://ryukkani.github.io/Football-life/) — 저장소의 Pages를 활성화하면 이 주소에서 실행됩니다.
+GitHub Pages 공개 주소: [축구 생활](https://ryukkani.github.io/Football-life/)
 
 - 스트라이커, 윙어, 미드필더, 센터백, 풀백, 골키퍼의 6개 포지션
 - 2000년과 2000/01 시즌을 기준으로 구성한 대한민국·잉글랜드·이탈리아·프랑스·독일·스페인의 104개 구단
