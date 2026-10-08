@@ -17,6 +17,34 @@ function openOffers(u){for(let i=0;i<3&&u.state().game.marketStep!=='offers';i++
 function finishUI(u){for(let guard=0;['ready','callup','international','cup','rehab'].includes(u.state().game.phase);guard++){assert.ok(guard<200,'UI progress stalled');const g=u.state().game;if(g.phase==='ready')u.click('advance');else if(g.phase==='rehab')u.click('rehab-choice',{value:'normal'});else if(g.phase==='cup')u.click(g.cupMatch.stage==='result'?'cup-continue':'cup-play',{value:'auto'});else if(g.phase==='callup')u.click('callup-decline');else u.click(g.camp.complete?'return':'international');}}
 function nationalPlayer(age=21,country='KR',value=72){const u=setup(),E=u.E,g=E.create({name:'대표팀 선수',number:9,pos:'ST',foot:'right',focus:[]},E.makeCandidate('ST',1,'ordinary'),1);g.clock=E.tick(g.birthYear+age,3,1);g.year=g.birthYear+age;g.age=age;g.stage='pro';g.country=country;g.clubId=country==='FR'?'FR-nantes':'KR-suwon';for(const id of E.activeAttributes(g.player))g.player.details[id]=value;E.recalc(g.player);g.reputation=100;g.trust=95;E.newPeriod(g);return{E,g};}
 const nationalStorage=g=>new Map([[STORE,JSON.stringify({version:2,game:g,archives:[],legacy:[]})]]);
+function honoursPlayer(){
+ const {E,g}=nationalPlayer(20,'KR',85);g.clock=E.tick(2005,1);g.year=2005;g.age=20;g.contract=36;g.contractTerms={role:'starter',bonus:0};g.intensity='light';E.newPeriod(g);
+ const advance=require('./advance-career.cjs');advance.finish(E,g,{accept:false});E.accept(g,'stay');advance.finish(E,g,{accept:false});return g;
+}
+test('season honours follow the four-second announcement and remain separate from scouting and offers',()=>{
+ const g=honoursPlayer(),u=setup(nationalStorage(g));u.click('hub');assert.match(u.html(),/다음 · 시즌 개인 시상/);const before=clone(u.state());
+ u.failSave(true);u.click('market-next',{},false);assert.deepEqual(u.state(),before);assert.notEqual(u.nodes.app.dataset.screen,'loading');
+ u.failSave(false);u.click('market-next',{},false);assert.equal(u.state().game.marketStep,'awards');u.advanceClock(3999);assert.equal(u.nodes.app.dataset.screen,'loading');u.advanceClock(1);
+ assert.match(u.html(),/SEASON HONOURS/);assert.match(u.html(),/시즌 베스트11/);assert.match(u.html(),/수상 성적과 선정 기준/);assert.doesNotMatch(u.html(),/class="offer"|scouting-report/);
+ const saved=clone(u.state()),reload=setup(u.storage);reload.click('hub');assert.match(reload.html(),/SEASON HONOURS/);assert.deepEqual(reload.state(),saved);
+ reload.click('market-next');assert.equal(reload.state().game.marketStep,'scout');assert.match(reload.html(),/scouting-report/);assert.doesNotMatch(reload.html(),/SEASON HONOURS|class="offer"/);
+ reload.click('market-next');assert.equal(reload.state().game.marketStep,'offers');assert.match(reload.html(),/class="offer"/);assert.deepEqual(reload.state().game.awards,saved.game.awards);
+});
+test('personal honours, team trophies and archived season winners are readable without changing the career',()=>{
+ const g=honoursPlayer(),u=setup(nationalStorage(g));u.click('hub');u.click('tab',{value:'career'});assert.match(u.html(),/수상 내역 보기/);const before=clone(u.state());
+ u.click('honours-open',{mode:'personal'});assert.equal(u.nodes.app.dataset.screen,'honours');assert.match(u.html(),/개인 수상|팀 우승|시즌 시상|선정 기준/);assert.match(u.html(),/수상 기록/);
+ if(g.awards.length){const a=g.awards[0];assert.match(u.html(),new RegExp(a.name));assert.match(u.html(),new RegExp(a.stats.minutes+'분'));}
+ u.click('honour-tab',{value:'season'});assert.match(u.html(),/SEASON HONOURS/);u.click('honour-tab',{value:'team'});assert.match(u.html(),/팀과 함께 들어 올린 트로피/);
+ u.click('honours-back');assert.match(u.html(),/나의 축구 기록/);assert.deepEqual(u.state(),before);
+ const empty=setup();start(empty);empty.click('honours-open',{mode:'personal'});assert.match(empty.html(),/첫 수상을 기다립니다/);assert.doesNotMatch(empty.html(),/SEASON HONOURS|이번 시즌 개인 수상 없음/);
+});
+test('award performance snapshots survive backups and malformed honours never replace a valid career',()=>{
+ const g=honoursPlayer(),u=setup(nationalStorage(g)),data=clone(u.state());assert.ok(u.Save.parse(JSON.stringify(data)));
+ for(const mutate of [s=>s.country='constructor',s=>s.awards={},s=>s.awards[0].stats.rating=11,s=>s.awards[0].stats.saveRate=150,s=>s.awards[0].name={text:'득점왕'}]){
+  const bad=clone(data);mutate(bad.game.history.at(-1).awardSeasons[0]);assert.throws(()=>u.Save.parse(JSON.stringify(bad)),/기록 파일/);
+ }
+ assert.deepEqual(u.state(),data);
+});
 
 test('U23 callup decisions survive reload, roll back failed saves and require acceptance before a match',()=>{
  const{E,g}=nationalPlayer();assert.ok(E.maybeCamp(g));const u=setup(nationalStorage(g));u.click('hub');assert.match(u.html(),/대한민국 U23 대표팀|소집 수락|이번 소집 거절/);assert.doesNotMatch(u.html(),/A매치/);const before=clone(u.state());u.click('international');assert.deepEqual(u.state(),before);u.failSave(true);u.click('callup-accept');assert.deepEqual(u.state(),before);u.failSave(false);u.click('callup-accept',{},false);assert.equal(u.state().game.phase,'international');assert.equal(u.nodes.app.dataset.screen,'loading');u.advanceClock(3999);assert.equal(u.nodes.app.dataset.screen,'loading');u.advanceClock(1);assert.match(u.html(),/U23 친선 경기/);
