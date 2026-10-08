@@ -154,7 +154,7 @@ function shootSide(g,attackPower,defensePower,count,context={}){
   const finishing=player?playingSkill(g,{finishing:.65,composure:.20,positioning:.15}):attackPower;
   let goalChance=clamp(.33+(finishing-keeper)*.0035,.10,.55);
   // Specialties improve the player's finish, without stacking a team-wide scoring multiplier.
-  if(player)goalChance=clamp(goalChance*(1+Math.min(.20,(context.effects.goal-1)*.35)),.08,.62);
+  if(player)goalChance=clamp(goalChance*(1+Math.min(.30,(context.effects.goal-1)*.35)),.08,.62);
   const on=rand(g)<onChance,goal=on&&rand(g)<goalChance;
   shots.push({minute,player,on,goal,xg:onChance*goalChance,active});
  }return shots.sort((a,b)=>a.minute-b.minute);
