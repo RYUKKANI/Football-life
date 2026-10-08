@@ -1,4 +1,5 @@
 :root{--blue:#1676c5;--navy:#14385b;--text:#18334f;--muted:#536b80;--line:#d5e1e9;--bg:#f2f6f8;--yellow:#ffe38e;--nav-height:72px;font-family:'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;letter-spacing:-.025em}
+[hidden]{display:none!important}
 body{background:#eaf0f4}
 #app{max-width:430px;min-height:100svh;padding-bottom:calc(var(--nav-height) + env(safe-area-inset-bottom));clip-path:none}
 main{min-height:calc(100svh - var(--nav-height));padding-bottom:26px}
