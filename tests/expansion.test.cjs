@@ -43,6 +43,13 @@ test('continental entries follow saved prior-year league order rather than only 
  assert.deepEqual(copy(c.teams.filter(t=>t.country==='EN').map(t=>t.id)),copy(E.sortTable(w).slice(0,4).map(t=>t.id)));
  const old=copy(g.competitionState.qualifications);X.qualification(g,w);assert.deepEqual(copy(g.competitionState.qualifications),old);
 });
+test('European summer preparation creates the upcoming cup season in July with future fixtures',()=>{
+ const g=pro('ST',44,'EN',2005,7),seed=g.seed;
+ assert.ok(g.competitionState.clubs['DOM-EN-2005']);assert.ok(g.competitionState.clubs['EU-2005']);
+ assert.equal(g.competitionState.clubs['DOM-EN-2004'],undefined);
+ const cups=E.ensureClubCups(g);assert.equal(g.seed,seed);
+ assert.ok(cups.every(c=>c.year===2005&&c.dates[0]>g.clock));
+});
 test('cup records count once in career totals and cannot inflate league-only individual rankings',()=>{
  const g=readyCup(pro('ST',98)),x=E.cupContext(g),before=g.period.matches.length;
  let m=E.playCup(g);if(g.cupMatch.stage==='shootout')m=E.playCup(g,'auto');
