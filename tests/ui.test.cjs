@@ -45,6 +45,12 @@ test('award performance snapshots survive backups and malformed honours never re
  }
  assert.deepEqual(u.state(),data);
 });
+test('legacy honours display saved winning values and leave missing best-eleven ratings unknown',()=>{
+ const g=honoursPlayer(),id=g.history.at(-1).awardSeasons[0].id;
+ for(const r of [...g.history,g.period])for(const season of r.awardSeasons||[])for(const a of season.awards){delete a.stats;delete a.minimum;delete a.joint;if(a.name==='베스트11'){delete a.metric;delete a.value;}}
+ const season=g.history.at(-1).awardSeasons[0],scorer=season.awards.find(a=>a.name==='득점왕'),u=setup(nationalStorage(g)),before=clone(u.state());u.click('honours-open',{mode:'season',world:id});
+ assert.match(u.html(),/이전 규칙으로 확정된 수상/);assert.match(u.html(),/award-number/);assert.match(u.html(),new RegExp(scorer.value+'골'));assert.doesNotMatch(u.html(),/<strong>0\.00<\/strong>/);assert.match(u.html(),/<strong>—<\/strong>/);assert.deepEqual(u.state(),before);
+});
 
 test('U23 callup decisions survive reload, roll back failed saves and require acceptance before a match',()=>{
  const{E,g}=nationalPlayer();assert.ok(E.maybeCamp(g));const u=setup(nationalStorage(g));u.click('hub');assert.match(u.html(),/대한민국 U23 대표팀|소집 수락|이번 소집 거절/);assert.doesNotMatch(u.html(),/A매치/);const before=clone(u.state());u.click('international');assert.deepEqual(u.state(),before);u.failSave(true);u.click('callup-accept');assert.deepEqual(u.state(),before);u.failSave(false);u.click('callup-accept',{},false);assert.equal(u.state().game.phase,'international');assert.equal(u.nodes.app.dataset.screen,'loading');u.advanceClock(3999);assert.equal(u.nodes.app.dataset.screen,'loading');u.advanceClock(1);assert.match(u.html(),/U23 친선 경기/);
