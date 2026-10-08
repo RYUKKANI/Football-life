@@ -32,11 +32,10 @@ h3{font-size:18px}
 .home-button{display:grid;place-items:center;width:35px;height:35px;background:#1e588b70;border:1px solid #e5f6ff5c;border-radius:9px}
 .home-button svg{width:19px;height:19px}
 .home-brand{position:relative;width:100%;max-width:300px;align-self:center;margin-top:clamp(33px,6svh,60px);text-align:center;transform:rotate(-5deg)}
-.home-brand h1{line-height:1;font-weight:1000;text-shadow:0 6px 0 #113353;filter:drop-shadow(0 3px 0 #153853);padding-right:14px}
+.home-brand h1{line-height:1;font-weight:1000;text-shadow:0 6px 0 #113353;filter:drop-shadow(0 3px 0 #153853)}
 .home-brand h1 span,.home-brand h1 strong{display:block;paint-order:stroke fill;-webkit-text-stroke:6px #123453;letter-spacing:-.09em}
-.home-brand h1 span{font-size:65px;color:#fff;line-height:1.06;margin-left:26px}
-.home-brand h1 strong{font-size:83px;color:#ffe58a;line-height:1.11;margin-left:46px}
-.brand-ball{position:absolute;left:0;bottom:20px;font-size:64px;line-height:1;filter:drop-shadow(0 4px 0 #123453)}
+.home-brand h1 span{font-size:65px;color:#fff;line-height:1.06}
+.home-brand h1 strong{font-size:83px;color:#ffe58a;line-height:1.11}
 .brand-english{font-size:10px;font-weight:900;letter-spacing:.24em;transform:rotate(5deg);color:#153853;margin-top:13px;text-shadow:0 1px 1px #fff}
 .home-story{margin-top:19px;text-align:center;color:#fff;font-size:13px;font-weight:800;line-height:1.8;text-shadow:0 1px 3px #174b6c,0 2px 8px #124462}
 .home-actions{margin-top:auto;width:100%;display:grid;gap:11px;padding-top:75px}
@@ -178,6 +177,6 @@ h3{font-size:18px}
 .big-start:active,.quick-button:active,.primary:active{transform:translateY(2px);box-shadow:none}
 .reduce-motion *{transition:none!important;scroll-behavior:auto!important}
 @media(min-width:560px){body{padding:16px 0}#app{border-radius:22px;min-height:calc(100svh - 32px);box-shadow:0 15px 60px #264d6320}main{min-height:calc(100svh - 104px)}.home{height:calc(100svh - 104px);border-radius:22px 22px 0 0}.bottom-nav{bottom:16px;border-radius:0 0 22px 22px}.player-header{border-radius:22px 22px 0 0}.story-header{border-radius:22px 22px 0 0}}
-@media(max-width:360px){.home{padding:21px 21px 18px}.home-brand{max-width:260px;margin-top:35px}.home-brand h1 span{font-size:57px}.home-brand h1 strong{font-size:74px}.brand-ball{font-size:55px;bottom:23px;left:5px}.home-story{font-size:12px}.content{padding:20px 14px 27px}.card{padding:19px 14px}.ability-grid{gap:18px 14px}.requirements{gap:7px}.identity b{font-size:16px}.identity span{font-size:10px}.overall b{font-size:28px}.talent-card strong{font-size:13px}.talent-card{min-height:155px}.quick-button{font-size:11px}.home-notice b{font-size:10px}}
-@media(max-height:740px) and (min-width:361px){.home-brand{margin-top:29px}.home-brand h1 span{font-size:59px}.home-brand h1 strong{font-size:76px}.brand-ball{font-size:58px;bottom:20px;left:10px}.home-story{font-size:12px;margin-top:15px}.home-actions{padding-top:67px}}
+@media(max-width:360px){.home{padding:21px 21px 18px}.home-brand{max-width:260px;margin-top:35px}.home-brand h1 span{font-size:57px}.home-brand h1 strong{font-size:74px}.home-story{font-size:12px}.content{padding:20px 14px 27px}.card{padding:19px 14px}.ability-grid{gap:18px 14px}.requirements{gap:7px}.identity b{font-size:16px}.identity span{font-size:10px}.overall b{font-size:28px}.talent-card strong{font-size:13px}.talent-card{min-height:155px}.quick-button{font-size:11px}.home-notice b{font-size:10px}}
+@media(max-height:740px) and (min-width:361px){.home-brand{margin-top:29px}.home-brand h1 span{font-size:59px}.home-brand h1 strong{font-size:76px}.home-story{font-size:12px;margin-top:15px}.home-actions{padding-top:67px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
