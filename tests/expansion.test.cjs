@@ -154,6 +154,13 @@ test('recent five seasons use actual records and stored OVR, leaving unknown his
  const rows=E.seasonTrend(g);assert.equal(rows.length,5);assert.deepEqual(copy(rows.map(r=>r.season)),['2002','2003','2004','2005','2006']);assert.equal(rows.at(-1).ovr,66);assert.equal(rows.at(-1).apps,1);assert.equal(rows.at(-1).saveRate,70);
  assert.ok(g.seasonSnapshots.every(s=>Object.keys(s.details).length===0));const before=copy(g);E.seasonTrend(g);assert.deepEqual(copy(g),before);
 });
+test('season comparison preserves the precise appearance-weighted rating shown in career records',()=>{
+ const g=pro('GK',45),start=g.clock;
+ const match={...E.blankStats(),date:start,kind:'pro',country:'KR',league:'2005',clubId:g.clubId,club:'수원',minutes:90,started:true};
+ g.period.matches=[{...match,rating:6.5},{...match,rating:6.6},{...match,rating:6.6},{...match,minutes:0,started:false,rating:0}];
+ const before=copy(g),row=E.seasonTrend(g).at(-1);
+ assert.equal(row.apps,3);assert.equal(row.rating.toFixed(2),'6.57');assert.equal(row.rating,row.ratingSum/row.apps);assert.deepEqual(copy(g),before);
+});
 test('portable backups reject invalid pending competition choices without weakening legacy migration',()=>{
  const g=readyCup(pro('CB',47));assert.ok(backup(g));
  for(const mutate of [x=>{x.cupMatch.stage='unknown';},x=>{x.cupMatch.fixture=999;},x=>{const c=E.cupContext(x).cup;c.rounds[0].matches[0].h='fake-team';},x=>{x.seasonSnapshots.push({key:'fake',country:'KR',start:1,end:2,endOvr:999,details:{}});}]){const bad=copy(g);mutate(bad);assert.throws(()=>backup(bad));}
