@@ -158,10 +158,10 @@ function menuIcon(id){
 }
 function settings(){
  const audio=FootballAudio.getSettings(),volume=(kind,label)=>'<div class="volume-control"><label for="'+kind+'-volume">'+label+'</label><output id="'+kind+'-volume-value" for="'+kind+'-volume">'+Math.round(audio[kind]*100)+'%</output><input id="'+kind+'-volume" type="range" min="0" max="100" step="1" value="'+Math.round(audio[kind]*100)+'" aria-label="'+label+' 음량"></div>';
- return '<main class="content settings-page">'+title('FOOTBALL LIFE','설정')+'<section class="card sound-settings"><div class="row"><h3>소리</h3>'+badge(audio.muted?'음소거':'소리 켜짐',audio.muted?'':'teal')+'</div><button class="setting-toggle" data-action="audio-mute" aria-pressed="'+audio.muted+'"><span>모든 소리 음소거</span><b>'+(audio.muted?'켜짐':'꺼짐')+'</b></button>'+volume('music','배경음')+volume('effects','버튼 효과음')+'<p class="now-playing">♪ '+esc(FootballAudio.getThemeName())+'</p><p class="help">현재 무대에 맞는 오르골 연주가 흐릅니다. 소리 설정은 이 브라우저에 저장됩니다.</p></section><section class="card"><h3>기록 보관</h3><p class="help">기록은 이 브라우저에 저장됩니다. 다른 기기나 사이트로 옮길 때는 백업 파일을 사용하세요.</p><div class="settings-actions">'+btn('기록 파일 저장','export','','outline full')+btn('기록 파일 불러오기','import','','outline full')+btn('보관 기록 관리','archives','','text-button full')+'</div></section><section class="card"><h3>화면</h3><button class="setting-toggle" data-action="toggle-motion" aria-pressed="'+reducedMotion+'"><span>움직임 줄이기</span><b>'+(reducedMotion?'켜짐':'꺼짐')+'</b></button><p class="help">화면과 버튼의 움직임을 줄입니다. 로딩 장면의 표시 시간은 유지됩니다.</p></section><section class="card"><h3>축구 생활</h3><p class="help">Football Life · 1.2.0</p>'+btn('게임 안내','guide','','outline full')+btn('업데이트 내용','notice','','text-button full')+'<details class="disclosure sources-fold"><summary>참고 자료</summary><ul>'+E.SOURCES.map(([t,u])=>'<li><a target="_blank" rel="noopener noreferrer" href="'+u+'">'+esc(t)+'</a></li>').join('')+'</ul><p class="help">플레이스타일 아이콘은 FC27 클럽 빌더의 원본을 사용했습니다. 경기·성장·이적 결과는 게임 규칙으로 계산합니다.</p></details></section></main>';
+ return '<main class="content settings-page">'+title('FOOTBALL LIFE','설정')+'<section class="card sound-settings"><div class="row"><h3>소리</h3>'+badge(audio.muted?'음소거':'소리 켜짐',audio.muted?'':'teal')+'</div><button class="setting-toggle" data-action="audio-mute" aria-pressed="'+audio.muted+'"><span>모든 소리 음소거</span><b>'+(audio.muted?'켜짐':'꺼짐')+'</b></button>'+volume('music','배경음')+volume('effects','버튼 효과음')+'<p class="now-playing">♪ '+esc(FootballAudio.getThemeName())+'</p><p class="help">현재 무대에 맞는 오르골 연주가 흐릅니다. 소리 설정은 이 브라우저에 저장됩니다.</p></section><section class="card"><h3>기록 보관</h3><p class="help">기록은 이 브라우저에 저장됩니다. 다른 기기나 사이트로 옮길 때는 백업 파일을 사용하세요.</p><div class="settings-actions">'+btn('기록 파일 저장','export','','outline full')+btn('기록 파일 불러오기','import','','outline full')+btn('보관 기록 관리','archives','','text-button full')+'</div></section><section class="card"><h3>화면</h3><button class="setting-toggle" data-action="toggle-motion" aria-pressed="'+reducedMotion+'"><span>움직임 줄이기</span><b>'+(reducedMotion?'켜짐':'꺼짐')+'</b></button><p class="help">화면과 버튼의 움직임을 줄입니다. 로딩 장면의 표시 시간은 유지됩니다.</p></section><section class="card"><h3>축구 생활</h3><p class="help">Football Life · 1.2.1</p>'+btn('게임 안내','guide','','outline full')+btn('업데이트 내용','notice','','text-button full')+'<details class="disclosure sources-fold"><summary>참고 자료</summary><ul>'+E.SOURCES.map(([t,u])=>'<li><a target="_blank" rel="noopener noreferrer" href="'+u+'">'+esc(t)+'</a></li>').join('')+'</ul><p class="help">플레이스타일 아이콘은 FC27 클럽 빌더의 원본을 사용했습니다. 경기·성장·이적 결과는 게임 규칙으로 계산합니다.</p></details></section></main>';
 }
 function showNotice(){
- dialog('업데이트 · 1.2.0','<ul><li>로딩 장면이 약 7초 동안 진행 과정을 보여줍니다. 결과 바로 보기도 사용할 수 있습니다.</li><li>버튼을 누르면 살짝 눌리는 움직임과 짧은 효과음이 나옵니다.</li><li>중학교·고등학교·국가대표·해외 구단에 서로 다른 오르골 배경음을 추가했습니다.</li><li>설정에서 전체 음소거, 배경음과 버튼 효과음의 음량을 조절할 수 있습니다.</li><li>학교 교표와 구단 엠블럼을 더 추가했습니다.</li><li>기존 커리어와 백업 기록은 그대로 이어집니다.</li></ul>');
+ dialog('업데이트 · 1.2.1','<ul><li>로딩 장면이 약 7초 동안 진행 과정을 보여줍니다. 결과 바로 보기도 사용할 수 있습니다.</li><li>버튼을 누르면 살짝 눌리는 움직임과 짧은 효과음이 나옵니다.</li><li>중학교·고등학교·국가대표·해외 구단에 서로 다른 오르골 배경음을 추가했습니다.</li><li>설정에서 전체 음소거, 배경음과 버튼 효과음의 음량을 조절할 수 있습니다.</li><li>학교 교표와 구단 엠블럼을 더 추가했습니다.</li><li>기존 커리어와 백업 기록은 그대로 이어집니다.</li></ul>');
 }
 function confirmImport(){
  if(!pendingImport)return false;
@@ -190,15 +190,16 @@ function transaction(action){
  const before=duplicate({game,archives,legacy});let result;
  try{result=action();if(!save())throw Error('save');return result;}catch(error){game=before.game;archives=before.archives;legacy=before.legacy;toast('저장하지 못해 진행을 취소했습니다. 기록 백업으로 저장 공간을 확보해 주세요.');return null;}
 }
-function playScene(label,steps,finish){
- scene={label,steps,step:0,finish};render();
+function playScene(label,steps,finish,sceneGame=game){
+ scene={label,steps,step:0,finish,game:sceneGame};render();
  const delay=Math.max(1500,Math.round(6000/steps.length));
  const tick=()=>{if(!scene)return;scene.step++;render(true);sceneTimer=setTimeout(scene.step>=scene.steps.length?finishScene:tick,scene.step>=scene.steps.length?800:delay);};
  sceneTimer=setTimeout(tick,delay);
 }
 function finishScene(){if(!scene)return;clearTimeout(sceneTimer);const finish=scene.finish;scene=null;finish?.();render();}
 function loadingScreen(){
- return '<main class="progress-scene" aria-live="polite"><span class="eyebrow">'+(game?E.dateText(game.clock):'2000 · 새로운 선수')+'</span><div class="scene-ball" aria-hidden="true">⚽</div><h2>'+esc(scene.label)+'</h2>'+(game?'<p>'+clubLabel(game.clubId,E.teamName(game))+'</p>':'')+'<ol>'+scene.steps.map((text,i)=>'<li class="'+(i===scene.step?'active':i<scene.step?'complete':'')+'"><span>'+esc(text)+'</span><b>'+ (i<scene.step?'완료':i===scene.step?'진행 중':'대기')+'</b></li>').join('')+'</ol>'+bar((scene.step+1)/scene.steps.length*100)+'<p class="scene-caption">다음 장면을 준비하고 있습니다.</p>'+btn('결과 바로 보기','skip-scene','','outline light full')+'</main>';
+ const g=scene.game;
+ return '<main class="progress-scene" aria-live="polite"><span class="eyebrow">'+(g?E.dateText(g.clock):'2000 · 새로운 선수')+'</span><div class="scene-ball" aria-hidden="true">⚽</div><h2>'+esc(scene.label)+'</h2>'+(g?'<p>'+clubLabel(g.clubId,E.teamName(g))+'</p>':'')+'<ol>'+scene.steps.map((text,i)=>'<li class="'+(i===scene.step?'active':i<scene.step?'complete':'')+'"><span>'+esc(text)+'</span><b>'+ (i<scene.step?'완료':i===scene.step?'진행 중':'대기')+'</b></li>').join('')+'</ol>'+bar((scene.step+1)/scene.steps.length*100)+'<p class="scene-caption">다음 장면을 준비하고 있습니다.</p>'+btn('결과 바로 보기','skip-scene','','outline light full')+'</main>';
 }
 function profileCard(g){
  const p=g.player,role=FootballCareerData.ROLES[g.period?.role||E.roleFor(g)].name;
@@ -290,7 +291,8 @@ function season(){
 }
 function render(keepScroll=false){
  const y=window.scrollY,opened=[...document.querySelectorAll('details[data-group][open]')].map(e=>e.dataset.group);
- FootballAudio.sync(game,scene?.label||'',screen==='profile'?pendingProfile?.game:null);
+ const viewGame=scene?scene.game:['create','talents','growth'].includes(screen)?null:screen==='profile'?pendingProfile?.game:game;
+ FootballAudio.sync(viewGame,scene?.label||'');
  if(app.dataset)app.dataset.screen=scene?'loading':screen;document.documentElement?.classList.toggle('reduce-motion',reducedMotion);
  app.innerHTML=scene?loadingScreen():(screen==='home'?home():screen==='create'?creation():screen==='talents'?candidateScreen():screen==='growth'?growth():screen==='profile'?profileScreen():screen==='rankings'?rankScreen():screen==='archives'?archivesScreen():screen==='settings'?settings():hub())+nav();
  document.querySelectorAll('button:not([type])').forEach(b=>b.type='button');
@@ -299,7 +301,7 @@ function render(keepScroll=false){
 
 function beginNew(){pendingProfile=null;specialStarted=0;draft={name:'',number:9,pos:'ST',foot:'right',tactic:'balanced',focus:[]};deck=[];rerolls=2;screen='create';render()}
 document.getElementById('dialog').addEventListener?.('close',()=>{pendingDeletion=null;pendingImport=null});
-document.addEventListener('submit',event=>{if(event.target.id!=='creation'||scene)return;event.preventDefault();FootballAudio.click();readDraft();if(!draft.name.trim())return;pendingProfile=null;deck=E.candidates(draft.pos,freshSeed());revealed=false;selected=0;playScene('새로운 선수의 재능', ['신체와 포지션 확인','재능 후보 준비'],()=>{screen='talents';});});
+document.addEventListener('submit',event=>{if(event.target.id!=='creation'||scene)return;event.preventDefault();FootballAudio.click();readDraft();if(!draft.name.trim())return;pendingProfile=null;deck=E.candidates(draft.pos,freshSeed());revealed=false;selected=0;playScene('새로운 선수의 재능', ['신체와 포지션 확인','재능 후보 준비'],()=>{screen='talents';},null);});
 document.addEventListener('input',event=>{const kind=event.target.id==='music-volume'?'music':event.target.id==='effects-volume'?'effects':null;if(!kind)return;FootballAudio.unlock();FootballAudio.setVolume(kind,Number(event.target.value)/100);const output=document.getElementById(kind+'-volume-value');if(output)output.textContent=Math.round(FootballAudio.getSettings()[kind]*100)+'%';});
 document.addEventListener('change',event=>{if(event.target.id==='backup-file'){readBackup(event.target.files[0]);event.target.value='';return;}if(event.target.id==='rank-metric'){rankMetric=event.target.value;render(true);return;}if(event.target.id==='league-country'){leagueCountry=event.target.value;render(true)}});
 document.addEventListener('click',event=>{const button=event.target.closest('button,summary');if(button&&!button.disabled)FootballAudio.click();const el=event.target.closest('[data-action]');if(!el||el.disabled)return;const a=el.dataset.action,v=el.dataset.value;if(scene){if(a==='skip-scene')finishScene();return;}let keep=false;try{
@@ -348,7 +350,7 @@ document.addEventListener('click',event=>{const button=event.target.closest('but
  if(a==='archetype'){pendingProfile=null;draft.archetypeId=v;keep=true}
  if(a==='tactic'&&E.TACTICS[v]){pendingProfile=null;draft.tactic=v;keep=true}
  if(a==='focus'&&E.activeAttributes({pos:draft.pos}).includes(v)){pendingProfile=null;if(draft.focus.includes(v))draft.focus=draft.focus.filter(k=>k!==v);else if(draft.focus.length<2)draft.focus.push(v);else toast('집중 육성은 2개까지 선택할 수 있습니다.');keep=true}
- if(a==='begin'){if(!pendingProfile||pendingProfile.kind!=='new')pendingProfile={kind:'new',game:E.create(draft,deck[selected],freshSeed())};playScene('선수 프로필 준비',['선수 정보 확인','첫 소속팀 등록'],()=>{screen='profile';});return;}
+ if(a==='begin'){if(!pendingProfile||pendingProfile.kind!=='new')pendingProfile={kind:'new',game:E.create(draft,deck[selected],freshSeed())};playScene('선수 프로필 준비',['선수 정보 확인','첫 소속팀 등록'],()=>{screen='profile';},pendingProfile.game);return;}
  if(a==='tab'){tab=v;screen='hub'}
  if(a==='player-tab'){playerTab=v}
  if(a==='season-view'&&['training','role','schedule','traits','special','military'].includes(v)){seasonView=v;tab='season';screen='hub'}
@@ -360,7 +362,7 @@ document.addEventListener('click',event=>{const button=event.target.closest('but
  if(a==='advance'&&game?.phase==='ready'){const result=transaction(()=>E.advance(game));if(result!==null){tab='season';playScene(game.phase==='international'?'국가대표 소집':'반기 경기 진행',['훈련과 컨디션 확인','대회 경기 진행','반기 기록 정리'],()=>{if(game.retired)tab='season';});}return;}
  if(a==='international'){if(transaction(()=>E.internationalMatch(game))){playScene('국가대표 경기',['선발 명단 확인','경기 진행','A매치 기록 확인'],()=>{});}return;}
  if(a==='return'){E.returnFromCamp(game);save();toast('대표팀 일정을 마쳤습니다. 소속팀 진행을 이어가세요.')}
- if(a==='offer'&&game?.phase==='market'&&game.marketStep==='offers'){const next=duplicate(game);if(E.accept(next,v)){pendingProfile={kind:'transfer',game:next,originClock:game.clock,offerId:v};playScene('다음 시즌 준비',['계약과 소속팀 확인','선수 프로필 준비'],()=>{screen='profile';});}return;}
+ if(a==='offer'&&game?.phase==='market'&&game.marketStep==='offers'){const next=duplicate(game);if(E.accept(next,v)){pendingProfile={kind:'transfer',game:next,originClock:game.clock,offerId:v};playScene('다음 시즌 준비',['계약과 소속팀 확인','선수 프로필 준비'],()=>{screen='profile';},next);}return;}
  if(a==='upgrade-plus'){if(!E.upgradePlus(game,v))toast('능력치와 레벨, 남은 강화 칸을 확인해 주세요.');else toast('플레이스타일+ 선택을 반영했습니다.');save();keep=true}
  if(a==='show-styles'){tab='player';playerTab='styles';screen='hub'}
  if(a==='show-plus'){tab='player';playerTab='archetype';screen='hub'}
