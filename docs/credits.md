@@ -33,3 +33,7 @@
 중학교 「첫 킥오프」, 고등학교 「푸른 유니폼」, 국가대표 「태극마크」, 해외 구단 「먼 무대」는 이 게임을 위해 작성한 16마디의 오르골 연주입니다. 기존 교가·응원가의 녹음, 가사, 선율을 사용하지 않았습니다. 악보는 src/soundtracks.js에 있고, src/game-audio.js가 Web Audio로 벨 음색과 버튼 효과음을 합성합니다. 별도 음원 파일이나 외부 음악 서비스는 필요하지 않습니다.
 
 음악은 첫 사용자 조작 후 시작되며, 화면을 다시 그릴 때 이어집니다. 무대가 바뀌면 음악을 전환하고, 페이지가 숨겨지면 음악을 멈춥니다. 소리 설정은 football-life-audio에 저장해 기존 선수 기록과 분리합니다.
+
+## 대륙대항전 구단 표장
+
+감바 오사카·주빌로 이와타·가시마 앤틀러스·알 힐랄·알 이티하드·알 아인의 현재 표장 6개는 [JoseArroyave/football-logos](https://github.com/JoseArroyave/football-logos)의 SVG 원본을 사용합니다. 기존 학교·구단 표장과 함께 `src/team-crests.js`에 저장했으며 개별 원본 주소는 team-crest-sources.json의 continentalClubs에 기록합니다. 당시 2000년 표장을 재현한 자료는 아닙니다.
