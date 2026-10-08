@@ -22,6 +22,14 @@
 
 ## 구단 엠블럼과 추가 진로
 
-구단 엠블럼 91개는 [K리그 공식 사이트](https://www.kleague.com/about/emblem.do), [football.db.logos](https://github.com/sportlogos/football.db.logos), [football-logos](https://github.com/luukhopman/football-logos)에서 제공하는 이미지를 그대로 저장했습니다. 원본 경로는 club-crest-sources.json에 기록합니다. 구단 표장은 각 구단 소유입니다. 국내 구단에는 현재 후신 구단의 엠블럼이 포함되어 정확한 2000년 엠블럼을 재현하지 않습니다. 자료가 없는 학교·대학·실업팀과 역사 구단 14곳에는 게임용 방패 표식을 사용합니다.
+기존 구단 엠블럼 91개는 [K리그 공식 사이트](https://www.kleague.com/about/emblem.do), [football.db.logos](https://github.com/sportlogos/football.db.logos), [football-logos](https://github.com/luukhopman/football-logos)에서 제공하는 이미지를 그대로 저장했습니다. 원본 경로는 club-crest-sources.json에 기록합니다. 추가 해외 구단 14곳은 [JoseArroyave/football-logos](https://github.com/JoseArroyave/football-logos)의 SVG 원본을 사용합니다. 중학교 16곳·고등학교 8곳은 각 학교 공식 홈페이지에서 교표 또는 홈페이지 로고를 가져왔습니다. 중동·경신 중학교는 같은 재단 중고교의 공용 교표를 사용합니다. 각 원본 페이지와 이미지, 표시 영역은 team-crest-sources.json에 기록합니다.
+
+2000 시즌 프로 구단 104곳과 학교 24곳에 실제 표장을 표시합니다. 구단과 학교 표장은 해당 기관 소유이며, 현재 확인할 수 있는 표장을 사용해 정확한 2000년 엠블럼을 재현하지 않습니다. 자료가 없는 대학·일부 실업팀에는 게임용 방패 표식을 사용합니다. 외부 이미지가 사라져도 게임의 로고가 유지되도록 파일 안에 원본을 포함했습니다.
 
 대학 축구부 이름은 [대한축구협회 대학 축구 자료](https://www.kfa.or.kr/layer_popup/popup_live.php?act=news_tv_detail&div_code=news&idx=3744)를 참고했습니다. 상무 명칭은 [김천상무 구단 소개](https://www.gimcheonfc.com/stm/stm.php)를 참고합니다. 대학·실업팀 일정, 시설 등급, 임대·입단 테스트·복무 평가는 자체 게임 규칙입니다.
+
+## 음악과 효과음
+
+중학교 「첫 킥오프」, 고등학교 「푸른 유니폼」, 국가대표 「태극마크」, 해외 구단 「먼 무대」는 이 게임을 위해 작성한 16마디의 오르골 연주입니다. 기존 교가·응원가의 녹음, 가사, 선율을 사용하지 않았습니다. 악보는 src/soundtracks.js에 있고, src/game-audio.js가 Web Audio로 벨 음색과 버튼 효과음을 합성합니다. 별도 음원 파일이나 외부 음악 서비스는 필요하지 않습니다.
+
+음악은 첫 사용자 조작 후 시작되며, 화면을 다시 그릴 때 이어집니다. 무대가 바뀌면 음악을 전환하고, 페이지가 숨겨지면 음악을 멈춥니다. 소리 설정은 football-life-audio에 저장해 기존 선수 기록과 분리합니다.
