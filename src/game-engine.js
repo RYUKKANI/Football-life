@@ -114,7 +114,7 @@ function updateTrainingReview(g){
 }
 function matchDevelopment(g,m,isNational=false){
  if(!m.minutes)return;
- const p=g.player,time=m.minutes/90;
+ const p=g.player,time=m.minutes/90,before={...g.player.details},startOvr=overall(g.player);
  const units={speed:time*.5,positioning:time*.5+m.shots*.25,finishing:m.shots*.4+m.goals,vision:m.keyPasses*.5+m.assists,passing:m.completed/25,agility:time*.4+m.dribbles*.12,balance:time*.4+m.dribbles*.12,reactions:time*.5,dribbling:m.dribbles*.5,composure:time*.5+Math.min(m.goals+m.assists,.8),marking:time*.6+m.interceptions*.2,tackle:m.tackles*.5,interceptions:m.interceptions*.5,jumping:time*.35,stamina:time*.6,strength:time*.35,aggression:time*.3};
  if(p.pos==='GK')Object.assign(units,{diving:m.saves*.45,reflexes:m.saves*.55,handling:m.claims*.5,gkPosition:time*.7+m.saves*.2,kicking:m.completed/18});
  for(const id of activeAttributes(p)){
@@ -123,6 +123,7 @@ function matchDevelopment(g,m,isNational=false){
   addDevelopment(g,id,(units[id]||0)*.022*ageRate*growthMultiplier(p)*(career()?.lateBonus(g)||1),isNational?'national':'matches');
  }
  recalc(p);xp(g,Math.round(8+time*10+m.goals*3+m.assists*2));unlock(g);updateTrainingReview(g);
+ m.development={source:isNational?'national':'matches',startOvr,endOvr:overall(p),changes:Object.fromEntries(activeAttributes(p).map(id=>[id,Math.round((p.details[id]-before[id])*1000)/1000]).filter(([,value])=>value>0))};
 }
 function appearance(g,teamPower,day,national=false){
  const state=health(g),existing=injuryAt(g,day);
@@ -160,7 +161,7 @@ function shootSide(g,attackPower,defensePower,count,context={}){
  }return shots.sort((a,b)=>a.minute-b.minute);
 }
 const shotMean=(attack,defense,venue=0)=>clamp(10.5+(attack-defense)*.12+venue,4.5,17);
-function teamPerformance(g,attack,defense,venue=0){const shots=shootSide(g,attack,defense,Math.min(30,poisson(g,shotMean(attack,defense,venue))));return {goals:shots.filter(s=>s.goal).length,shots:shots.length,onTarget:shots.filter(s=>s.on).length};}
+function teamPerformance(g,attack,defense,venue=0,includeEvents=false){const shots=shootSide(g,attack,defense,Math.min(30,poisson(g,shotMean(attack,defense,venue))));return {goals:shots.filter(s=>s.goal).length,shots:shots.length,onTarget:shots.filter(s=>s.on).length,...(includeEvents?{events:shots.map(({minute,on,goal})=>({minute,on,goal}))}:{})};}
 function teamGoals(g,attack,defense,venue=0){return teamPerformance(g,attack,defense,venue).goals;}
 function matchRating(pos,m,variation=0){
  if(!m.minutes)return 0;
@@ -188,7 +189,7 @@ function simulateAppearance(g,ownPower,opponentPower,day,ownHome=true,neutral=fa
  const oppEvents=shootSide(g,opponentPower,ownDefense,opponentShots,{app,opp:true,share:0,effects:e});
  const own=ownEvents.filter(s=>s.goal).length,opp=oppEvents.filter(s=>s.goal).length,personal=ownEvents.filter(s=>s.player);
  const assistShare={ST:.17,WG:.33,MF:.43,CB:.075,FB:.24,GK:.008}[p.pos]*(.4+playingSkill(g,{vision:.55,passing:.35,composure:.1})/110)*e.assist;
- let assists=0;for(const s of ownEvents)if(s.goal&&!s.player&&s.active&&rand(g)<assistShare)assists++;
+ let assists=0;for(const s of ownEvents)if(s.goal&&!s.player&&s.active&&rand(g)<assistShare){assists++;s.assist=true;}
  const goals=personal.filter(s=>s.goal).length,onTarget=personal.filter(s=>s.on).length;
  const passRate={ST:.35,WG:.48,MF:.76,CB:.48,FB:.55,GK:.25}[p.pos];
  const passes=app.minutes?Math.max(assists,Math.round(app.minutes*passRate*(.8+rand(g)*.4))):0;
@@ -205,6 +206,8 @@ function simulateAppearance(g,ownPower,opponentPower,day,ownHome=true,neutral=fa
  const claims=p.pos==='GK'?binomial(g,poisson(g,time*2.5),clamp(playingSkill(g,{handling:.65,gkPosition:.25,strength:.1})/110,.2,.94)):0;
  const clean=app.minutes>=60&&conceded===0?1:0;
  const frame={...app,own,opp,goals,assists,shots:personal.length,onTarget,passes,completed,keyPasses,dribbleAttempts,dribbles,tackleAttempts,tackles,interceptions,claims,saves,conceded,clean,teamShots:ownShots,teamOnTarget:ownEvents.filter(s=>s.on).length,opponentShots,opponentOnTarget:oppEvents.filter(s=>s.on).length,facedOnTarget:activeOpp.filter(s=>s.on).length,xg:round(personal.reduce((n,s)=>n+s.xg,0)),matchDay:day,modelVersion:4};
+ // Reuse the actual shot minutes. Recording an event consumes no extra randomness.
+ frame.timeline=[...ownEvents.filter(s=>s.goal).map(s=>({minute:s.minute,type:'goal',side:'own',player:s.player,assist:!!s.assist})),...oppEvents.filter(s=>s.goal||p.pos==='GK'&&s.active&&s.on).map(s=>({minute:s.minute,type:s.goal?'goal':'save',side:'opp',player:s.active&&p.pos==='GK',assist:false}))].sort((a,b)=>a.minute-b.minute);
  frame.rating=matchRating(p.pos,frame,(rand(g)-.5)*.45);return frame;
 }
 function rollCandidate(g,pos,talentId){

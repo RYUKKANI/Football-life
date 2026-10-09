@@ -1,26 +1,79 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const files=['era-2000.js','style-rules.js','style-icons.js','home-art.js','game-data.js','career-data.js','game-engine.js','game-career.js','game-national.js','game-expansion.js','club-crests.js','team-crests.js','game-save.js','soundtracks.js','game-audio.js','game-ui.js'];
+const files=['era-2000.js','style-rules.js','style-icons.js','home-art.js','game-data.js','career-data.js','game-engine.js','game-career.js','game-national.js','game-expansion.js','game-collection.js','club-crests.js','team-crests.js','fflate.js','game-save.js','soundtracks.js','game-audio.js','game-ui.js'];
 const source=files.map(n=>fs.readFileSync(path.join(__dirname,'../src',n),'utf8')).join('\n');
 const STORE='this-life-football-v2',clone=v=>JSON.parse(JSON.stringify(v));
-function setup(storage=new Map()){
+function setup(storage=new Map(),maxStorage=Infinity){
  const listeners={},dialogEvents={},errors=[],nodes={app:{innerHTML:'',dataset:{}},toast:{textContent:'',classList:{add(){},remove(){}}},'backup-file':{click(){},value:''},dialog:{innerHTML:'',open:false,showModal(){this.open=true},close(){this.open=false;dialogEvents.close?.()},addEventListener(type,fn){dialogEvents[type]=fn}}};
  let failSave=false,now=0,nextTimer=0;const timers=new Map();
  const document={documentElement:{classList:{toggle(){}}},getElementById:id=>nodes[id]||null,querySelectorAll:()=>[],addEventListener:(type,fn)=>listeners[type]=fn,createElement:()=>({click(){}})};
- const context={document,crypto:{getRandomValues(a){a[0]=914;return a}},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>{if(failSave)throw Error('Quota test');storage.set(k,v)}},window:{scrollY:0,scrollTo(){}},console:{error:e=>errors.push(e)},setTimeout:(fn,delay)=>{timers.set(++nextTimer,{fn,at:now+delay});return nextTimer},clearTimeout:id=>timers.delete(id),Blob,URL};
- vm.createContext(context);vm.runInContext(source+';this.E=FootballEngine;this.Save=FootballSave;this.Audio=FootballAudio;',context);
+ const context={TextEncoder,TextDecoder,document,crypto:{getRandomValues(a){a[0]=914;return a}},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>{if(failSave||v.length*2>maxStorage)throw Error('Quota test');storage.set(k,v)}},window:{scrollY:0,scrollTo(){}},console:{error:e=>errors.push(e)},setTimeout:(fn,delay)=>{timers.set(++nextTimer,{fn,at:now+delay});return nextTimer},clearTimeout:id=>timers.delete(id),Blob,URL};
+ vm.createContext(context);vm.runInContext(source+';this.E=FootballEngine;this.C=FootballCollection;this.Save=FootballSave;this.Audio=FootballAudio;',context);
  const endScene=()=>{if(nodes.app.dataset.screen==='loading')listeners.click({target:{closest:()=>({dataset:{action:'skip-scene'},disabled:false})}});};
- return {E:context.E,Save:context.Save,Audio:context.Audio,storage,nodes,html:()=>nodes.app.innerHTML,state:()=>JSON.parse(storage.get(STORE)||'null'),failSave:v=>{failSave=v},advanceClock(ms){const end=now+ms;for(let i=0;i<100;i++){const due=[...timers].filter(([,t])=>t.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!due)break;now=due[1].at;timers.delete(due[0]);due[1].fn();}now=end;},click(action,fields={},skip=true){listeners.click({target:{closest:()=>({dataset:{action,...fields},disabled:false})}});if(skip)endScene();assert.equal(errors.length,0,errors.map(e=>e.message).join(';'));},submit(skip=true){listeners.submit({target:{id:'creation'},preventDefault(){}});if(skip)endScene();},async import(data){listeners.change({target:{id:'backup-file',value:'file.json',files:[{size:JSON.stringify(data).length,text:async()=>JSON.stringify(data)}]}});await new Promise(setImmediate);}};
+ return {E:context.E,C:context.C,Save:context.Save,Audio:context.Audio,storage,nodes,html:()=>nodes.app.innerHTML,state:()=>clone(context.Save.decode(storage.get(STORE)||'null')),failSave:v=>{failSave=v},change(id,value){listeners.change({target:{id,value}});},advanceClock(ms){const end=now+ms;for(let i=0;i<100;i++){const due=[...timers].filter(([,t])=>t.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!due)break;now=due[1].at;timers.delete(due[0]);due[1].fn();}now=end;},click(action,fields={},skip=true){listeners.click({target:{closest:()=>({dataset:{action,...fields},disabled:false})}});if(skip)endScene();assert.equal(errors.length,0,errors.map(e=>e.message).join(';'));},submit(skip=true){listeners.submit({target:{id:'creation'},preventDefault(){}});if(skip)endScene();},async import(data){listeners.change({target:{id:'backup-file',value:'file.json',files:[{size:JSON.stringify(data).length,text:async()=>JSON.stringify(data)}]}});await new Promise(setImmediate);}};
 }
 function start(u,pos='ST',name='테스트 선수'){u.click('new');u.nodes.name={value:name};u.nodes.number={value:'9'};u.click('draft',{key:'pos',value:pos});u.submit();u.click('growth');u.click('begin');u.click('confirm-profile');}
 function openOffers(u){for(let i=0;i<3&&u.state().game.marketStep!=='offers';i++)u.click('market-next');assert.equal(u.state().game.marketStep,'offers');}
 function finishUI(u){for(let guard=0;['ready','callup','international','cup','rehab'].includes(u.state().game.phase);guard++){assert.ok(guard<200,'UI progress stalled');const g=u.state().game;if(g.phase==='ready')u.click('advance');else if(g.phase==='rehab')u.click('rehab-choice',{value:'normal'});else if(g.phase==='cup')u.click(g.cupMatch.stage==='result'?'cup-continue':'cup-play',{value:'auto'});else if(g.phase==='callup')u.click('callup-decline');else u.click(g.camp.complete?'return':'international');}}
 function nationalPlayer(age=21,country='KR',value=72){const u=setup(),E=u.E,g=E.create({name:'대표팀 선수',number:9,pos:'ST',foot:'right',focus:[]},E.makeCandidate('ST',1,'ordinary'),1);g.clock=E.tick(g.birthYear+age,3,1);g.year=g.birthYear+age;g.age=age;g.stage='pro';g.country=country;g.clubId=country==='FR'?'FR-nantes':'KR-suwon';for(const id of E.activeAttributes(g.player))g.player.details[id]=value;E.recalc(g.player);g.reputation=100;g.trust=95;E.newPeriod(g);return{E,g};}
 const nationalStorage=g=>new Map([[STORE,JSON.stringify({version:2,game:g,archives:[],legacy:[]})]]);
+test('large compressed clubhouses import, save and reopen within a five-megabyte budget without losing archived records',async()=>{
+ const source=setup();start(source);const data=clone(source.state());
+ const notes=Array.from({length:30000},(_,i)=>'훈련과 경기 · 첫 골과 도움, 출전 기록을 계속 보관합니다 '+i);
+ data.game.period.events=notes;const archived=clone(data.game);archived.player.name='보관한 선수';data.archives=[archived];
+ const raw=JSON.stringify(data),packed=source.Save.serialize(data);assert.ok(raw.length*2>5000000);assert.ok(packed.length*2<5000000);
+ const u=setup(new Map(),5000000);await u.import(JSON.parse(packed));assert.ok(u.nodes.dialog.open);u.click('confirm-import');
+ assert.deepEqual(u.state().game,data.game);assert.deepEqual(u.state().archives,data.archives);u.click('archives');u.click('collection-tab',{value:'eleven'});u.click('xi-auto');
+ assert.match(u.storage.get(STORE),/"encoding":"fgz1"/);const saved=clone(u.state());assert.deepEqual(saved.game,data.game);assert.deepEqual(saved.archives,data.archives);
+ u.failSave(true);u.click('friendly-play');assert.deepEqual(u.state(),saved);u.failSave(false);
+ const reload=setup(u.storage,5000000);reload.click('archives');assert.match(reload.html(),/보관한 선수/);assert.deepEqual(reload.state(),saved);
+});
+test('shootout reveals wait four seconds and preserve the already completed match without showing penalty results early',()=>{
+ const {E,g}=nationalPlayer(20,'KR',76),steps=require('./advance-career.cjs');
+ for(let n=0;n<150&&(g.phase!=='cup'||E.cupContext(g).round.stage!=='knockout');n++){if(g.phase==='market')E.accept(g,'stay');else steps.step(E,g,{accept:false});}
+ assert.equal(g.phase,'cup');assert.equal(E.cupContext(g).round.stage,'knockout');let tied=null;
+ for(let seed=1;seed<=80&&!tied;seed++){const candidate=clone(g);candidate.seed=seed;E.playCup(candidate,'auto');if(candidate.cupMatch.stage==='shootout')tied=candidate;}
+ assert.ok(tied,'A real tied fixture is available');const u=setup(nationalStorage(tied));u.click('hub');const before=clone(u.state());u.click('cup-play',{value:'auto'},false);
+ const saved=clone(u.state()),m=saved.game.period.matches.at(-1);assert.ok(m.shootout);assert.equal(saved.game.period.apps,before.game.period.apps);assert.deepEqual(saved.game.player.details,before.game.player.details);
+ assert.match(u.html(),/승부차기가 진행 중/);assert.doesNotMatch(u.html(),/shootout-score|match-event-list|경기 경험으로 성장/);
+ u.advanceClock(3999);assert.equal(u.nodes.app.dataset.screen,'loading');assert.doesNotMatch(u.html(),/shootout-score/);u.advanceClock(1);assert.match(u.html(),/shootout-score/);assert.deepEqual(u.state(),saved);
+ const reload=setup(u.storage);reload.click('hub');assert.match(reload.html(),/shootout-score/);assert.deepEqual(reload.state(),saved);
+});
 function honoursPlayer(){
  const {E,g}=nationalPlayer(20,'KR',85);g.clock=E.tick(2005,1);g.year=2005;g.age=20;g.contract=36;g.contractTerms={role:'starter',bonus:0};g.intensity='light';E.newPeriod(g);
  const advance=require('./advance-career.cjs');advance.finish(E,g,{accept:false});E.accept(g,'stay');advance.finish(E,g,{accept:false});return g;
 }
+test('clubhouse filters, two-player comparison and club card faces inspect saved prime players without changing careers',()=>{
+ const b=nationalPlayer(25,'KR',84).g;
+ // Use a freshly created goalkeeper so archetype and ability definitions remain valid.
+ const helper=setup(),gk=helper.E.create({name:'수비 골키퍼',number:1,pos:'GK',foot:'right',focus:[]},helper.E.makeCandidate('GK',100,'ordinary'),100);
+ b.player.name='비교 공격수';const u=setup(new Map([[STORE,JSON.stringify({version:2,game:gk,archives:[b],legacy:[]})]])),before=clone(u.state());
+ u.click('archives');assert.match(u.html(),/클럽하우스|선수 보관|베스트11/);assert.match(u.html(),/collection-cards/);assert.match(u.html(),/수비 골키퍼|비교 공격수/);
+ u.change('collection-position','GK');assert.doesNotMatch(u.html(),/비교 공격수/);u.change('collection-position','all');u.click('collection-view',{value:'list'});assert.match(u.html(),/collection-list-row/);
+ const rows=u.C.entries(before.game,before.archives);for(const r of rows)u.click('collection-select',{key:r.key});u.click('collection-compare');assert.equal(u.nodes.app.dataset.screen,'collection-compare');assert.match(u.html(),/전성기 세부 능력치|포지션별 대표 성적/);
+ u.click('collection-back');u.click('collection-card',{source:'archives',index:'0'});assert.match(u.html(),/collection-player-card|shirt-body|비교 공격수/);u.click('collection-face',{value:'back'});assert.match(u.html(),/card-back|전성기 세부 능력치|아키타입|개인 수상/);assert.deepEqual(u.state(),before);
+});
+test('best eleven saves a separate four-second exhibition, rolls back quota failures, and reopens the same report',()=>{
+ const u=setup();start(u,'MF','친선 선수');const career=clone(u.state().game);u.click('archives');u.click('collection-tab',{value:'eleven'});assert.equal((u.html().match(/data-action="xi-pick"/g)||[]).length,11);assert.match(u.html(),/기본 선수/);
+ u.failSave(true);u.click('xi-auto');assert.equal(u.state().clubhouse,undefined);assert.deepEqual(u.state().game,career);u.failSave(false);u.click('xi-auto');assert.ok(u.state().clubhouse);u.change('xi-formation','442');assert.equal(u.state().clubhouse.formation,'442');
+ const before=clone(u.state());u.failSave(true);u.click('friendly-play',{},false);assert.deepEqual(u.state(),before);assert.notEqual(u.nodes.app.dataset.screen,'loading');u.failSave(false);u.click('friendly-play',{},false);const saved=clone(u.state());assert.equal(saved.clubhouse.results.length,1);assert.deepEqual(saved.game,career);assert.match(u.html(),/match-live-clock|나의 베스트11/);
+ u.click('friendly-play',{},false);assert.deepEqual(u.state(),saved,'a second click during the reveal cannot play another match');u.advanceClock(3999);assert.equal(u.nodes.app.dataset.screen,'loading');u.advanceClock(1);assert.equal(u.nodes.app.dataset.screen,'friendly-result');assert.match(u.html(),/선수별 경기 성적|팀 경기 분석/);
+ const reload=setup(u.storage);reload.click('archives');reload.click('collection-tab',{value:'eleven'});reload.click('friendly-result',{id:saved.clubhouse.results[0].id});assert.equal(reload.nodes.app.dataset.screen,'friendly-result');assert.deepEqual(reload.state(),saved);assert.ok(reload.Save.parse(JSON.stringify(saved)).clubhouse);
+ const earlier={version:2,game:null,archives:[career],legacy:[]};assert.deepEqual(clone(reload.Save.merge(saved,earlier).clubhouse),saved.clubhouse,'old backups preserve the existing lineup and exhibitions');
+});
+test('a clubhouse with default players can be backed up and imported before a career exists',async()=>{
+ const u=setup();u.click('archives');u.click('collection-tab',{value:'eleven'});u.click('friendly-play');assert.equal(u.state().game,null);const data=clone(u.state());assert.ok(u.Save.parse(JSON.stringify(data)).clubhouse);
+ const v=setup();await v.import(data);v.click('confirm-import');assert.deepEqual(v.state(),data);v.click('archives');v.click('collection-tab',{value:'eleven'});assert.match(v.html(),/최근 친선전/);
+});
+test('new milestone notices persist and acknowledging them never changes actual performance or seed',()=>{
+ const u=setup();start(u,'MF','이정표 선수');u.click('advance');finishUI(u);assert.ok(u.state().game.milestoneNotices.length);assert.match(u.html(),/새로운 커리어 이정표/);const before=clone(u.state().game),list=u.C.milestones(before);assert.ok(list.some(m=>m.id==='debut'));
+ const reload=setup(u.storage);reload.click('hub');assert.match(reload.html(),/새로운 커리어 이정표/);reload.click('milestone-dismiss');const after=clone(reload.state().game);delete before.milestoneNotices;delete before.milestoneAcknowledged;delete after.milestoneNotices;delete after.milestoneAcknowledged;assert.deepEqual(after,before);reload.click('collection-milestones',{key:reload.C.identity(reload.state().game)});assert.match(reload.html(),/첫 출전|milestone-timeline/);
+});
+test('backup validation rejects forged goal timing, growth and exhibition results before importing',async()=>{
+ const u=setup();start(u);u.click('advance');finishUI(u);u.click('archives');u.click('collection-tab',{value:'eleven'});u.click('friendly-play');const valid=clone(u.state());assert.ok(u.Save.parse(JSON.stringify(valid)));
+ for(const mutate of [d=>d.clubhouse.results[0].own++,d=>d.clubhouse.results[0].players[0].completed=9999,d=>d.game.history[0].matches[0].timeline.push({minute:999,side:'own',type:'goal',player:true,assist:false}),d=>d.game.history[0].matches.find(m=>m.development).development.changes.finishing=Infinity]){const bad=clone(valid);mutate(bad);assert.throws(()=>u.Save.parse(JSON.stringify(bad)),/기록 파일/);}
+ const malformed=clone(valid);malformed.clubhouse.formation='constructor';await u.import(malformed);assert.equal(u.nodes.dialog.open,false);assert.deepEqual(u.state(),valid);
+});
 test('season honours follow the four-second announcement and remain separate from scouting and offers',()=>{
  const g=honoursPlayer(),u=setup(nationalStorage(g));u.click('hub');assert.match(u.html(),/다음 · 시즌 개인 시상/);const before=clone(u.state());
  u.failSave(true);u.click('market-next',{},false);assert.deepEqual(u.state(),before);assert.notEqual(u.nodes.app.dataset.screen,'loading');
@@ -122,7 +175,7 @@ test('new role, mentor and ranking screens are separate, persist rewards once, a
 test('two-step and three-step loading last exactly 4 seconds; reduced motion and skipping preserve the result',()=>{
  const u=setup();u.click('settings');u.click('toggle-motion');u.click('new');u.nodes.name={value:'연출 선수'};u.nodes.number={value:'9'};u.submit(false);
  assert.equal(u.nodes.app.dataset.screen,'loading');u.advanceClock(1749);assert.doesNotMatch(u.html(),/>완료</);u.advanceClock(1);assert.match(u.html(),/>완료</);u.advanceClock(1750);assert.equal((u.html().match(/>완료</g)||[]).length,2);u.advanceClock(499);assert.equal(u.nodes.app.dataset.screen,'loading');u.advanceClock(1);assert.equal(u.nodes.app.dataset.screen,'talents');
- u.click('growth');u.click('begin');u.click('confirm-profile');u.click('advance',{},false);const saved=clone(u.state());u.advanceClock(3498);assert.equal((u.html().match(/>완료</g)||[]).length,3);u.advanceClock(501);assert.equal(u.nodes.app.dataset.screen,'loading');u.advanceClock(1);assert.notEqual(u.nodes.app.dataset.screen,'loading');assert.deepEqual(u.state(),saved);finishUI(u);assert.match(u.html(),/반기 기록/);openOffers(u);u.click('offer',{value:'stay'});u.click('advance',{},false);const skipped=clone(u.state());u.click('skip-scene');const skippedHTML=u.html();assert.notEqual(u.nodes.app.dataset.screen,'loading');u.advanceClock(10000);assert.deepEqual(u.state(),skipped);assert.equal(u.html(),skippedHTML);finishUI(u);assert.match(u.html(),/반기 기록/);
+ u.click('growth');u.click('begin');u.click('confirm-profile');u.click('advance',{},false);const saved=clone(u.state());u.advanceClock(3498);assert.match(u.html(),/match-live-clock|다음 일정 준비/);u.advanceClock(501);assert.equal(u.nodes.app.dataset.screen,'loading');u.advanceClock(1);assert.notEqual(u.nodes.app.dataset.screen,'loading');assert.deepEqual(u.state(),saved);finishUI(u);assert.match(u.html(),/반기 기록/);openOffers(u);u.click('offer',{value:'stay'});u.click('advance',{},false);const skipped=clone(u.state());u.click('skip-scene');const skippedHTML=u.html();assert.notEqual(u.nodes.app.dataset.screen,'loading');u.advanceClock(10000);assert.deepEqual(u.state(),skipped);assert.equal(u.html(),skippedHTML);finishUI(u);assert.match(u.html(),/반기 기록/);
 });
 test('sound controls are available and preferences survive reopening without changing the player',()=>{
  const u=setup();start(u);const before=clone(u.state());u.click('settings');assert.match(u.html(),/배경음/);assert.match(u.html(),/버튼 효과음/);assert.match(u.html(),/id="music-volume"/);u.click('audio-mute');assert.equal(JSON.parse(u.storage.get('football-life-audio')).muted,true);assert.deepEqual(u.state(),before);const again=setup(u.storage);again.click('settings');assert.match(again.html(),/음소거/);assert.match(again.html(),/aria-pressed="true"/);

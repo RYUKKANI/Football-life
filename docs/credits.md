@@ -3,8 +3,9 @@
 ## 이미지와 화면
 
 - 메인 경기장 배경: 이 게임을 위해 제작한 일러스트 `assets/home-cover.png`.
-- 로고: 축구 생활 / Football Life 이름과 축구공을 사용한 화면 내 글자 구성.
+- 로고: 축구 생활 / Football Life 이름의 화면 내 글자 구성.
 - 하단 메뉴 및 사이트 아이콘: 게임 내 SVG.
+- 선수 카드·유니폼 실루엣·베스트11 경기장: 게임 내 HTML/CSS/SVG 구성. 구단 표장의 색상을 참고하며, 유니폼은 게임용 실루엣입니다. 새로운 타사 그림을 사용하지 않습니다.
 - 플레이스타일 아이콘 36개: 사용자가 지정한 [FC27 클럽 빌더](https://fc27builderbuilder.pages.dev/)의 원본 PNG. `src/style-icons.js`에 포함되어 있습니다. 아이콘 목록과 원본 주소는 [playstyle-assets.json](playstyle-assets.json)에 기록했습니다.
 - 메인 메뉴 구성 참고: [이번 생은 야구다](https://slbcareer.com/). 해당 게임의 로고나 배경 이미지는 이 저장소에 포함하지 않습니다.
 
@@ -37,3 +38,9 @@
 ## 대륙대항전 구단 표장
 
 감바 오사카·주빌로 이와타·가시마 앤틀러스·알 힐랄·알 이티하드·알 아인의 현재 표장 6개는 [JoseArroyave/football-logos](https://github.com/JoseArroyave/football-logos)의 SVG 원본을 사용합니다. 기존 학교·구단 표장과 함께 `src/team-crests.js`에 저장했으며 개별 원본 주소는 team-crest-sources.json의 continentalClubs에 기록합니다. 당시 2000년 표장을 재현한 자료는 아닙니다.
+
+## 기록 압축
+
+- fflate 0.8.3 (MIT), Arjun Barrett: https://github.com/101arrowz/fflate
+- 공식 npm 배포의 브라우저 파일을 프로젝트에 포함합니다. 저장과 백업은 추가 네트워크 요청 없이 압축합니다.
+- 라이선스 원문은 `fflate-license.txt`와 배포 스크립트에 포함합니다.

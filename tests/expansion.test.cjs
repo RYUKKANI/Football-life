@@ -1,8 +1,8 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const advance=require('./advance-career.cjs'),copy=x=>JSON.parse(JSON.stringify(x));
-const context={};vm.createContext(context);
-const files=['era-2000.js','style-rules.js','game-data.js','career-data.js','game-engine.js','game-career.js','game-national.js','game-expansion.js','game-save.js'];
+const context={TextEncoder,TextDecoder};vm.createContext(context);
+const files=['era-2000.js','style-rules.js','game-data.js','career-data.js','game-engine.js','game-career.js','game-national.js','game-expansion.js','game-collection.js','fflate.js','game-save.js'];
 vm.runInContext(files.map(n=>fs.readFileSync(path.join(__dirname,'../src',n),'utf8')).join('\n')+';this.E=FootballEngine;this.X=FootballExpansion;this.Save=FootballSave;',context);
 const {E,X,Save}=context;
 function pro(pos='ST',seed=83,country='KR',year=2005,month=1,value=85){
