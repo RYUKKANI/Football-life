@@ -180,14 +180,25 @@ test('two-step and three-step loading last exactly 4 seconds; reduced motion and
 test('sound controls are available and preferences survive reopening without changing the player',()=>{
  const u=setup();start(u);const before=clone(u.state());u.click('settings');assert.match(u.html(),/배경음/);assert.match(u.html(),/버튼 효과음/);assert.match(u.html(),/id="music-volume"/);u.click('audio-mute');assert.equal(JSON.parse(u.storage.get('football-life-audio')).muted,true);assert.deepEqual(u.state(),before);const again=setup(u.storage);again.click('settings');assert.match(again.html(),/음소거/);assert.match(again.html(),/aria-pressed="true"/);
 });
+
+test('the music library previews eighteen songs, advances a stage playlist, and returns without changing the career',()=>{
+ const u=setup();start(u,'GK');const before=clone(u.state());assert.equal(u.Audio.getTheme(),'middle');
+ u.click('settings');assert.equal((u.html().match(/data-action="audio-track"/g)||[]).length,18);assert.match(u.html(),/음악 모음|18곡|다음 곡/);
+ u.click('audio-next');assert.equal(u.Audio.getTheme(),'middle-afterschool');assert.match(u.html(),/방과 후 운동장/);
+ u.click('audio-track',{value:'national-night'});assert.equal(u.Audio.getTheme(),'national-night');assert.match(u.html(),/별 아래 태극기/);
+ u.click('audio-mute');assert.equal(u.Audio.getTheme(),'national-night');assert.match(u.html(),/음소거/);
+ u.click('audio-stage');assert.equal(u.Audio.getTheme(),'middle-afterschool');
+ u.click('audio-track',{value:'overseas-lights'});u.click('hub');assert.equal(u.Audio.getTheme(),'middle-afterschool');
+ assert.deepEqual(u.state(),before);u.click('home');assert.equal(u.Audio.getTheme(),'home-dawn');u.click('archives');assert.equal(u.Audio.getTheme(),'home-dawn');
+});
 test('creating another player uses the new season and theme while preserving the current overseas career',()=>{
  const original=setup();start(original,'GK','기존 선수');const data=clone(original.state());
  Object.assign(data.game,{country:'FR',clubId:'FR-guingamp',stage:'pro',year:2005,age:20,clock:original.E.tick(2005,7)});
- const u=setup(new Map([[STORE,JSON.stringify(data)]])),before=clone(u.state());assert.equal(u.Audio.getTheme(),'overseas');
+ const u=setup(new Map([[STORE,JSON.stringify(data)]])),before=clone(u.state());assert.equal(u.Audio.getTheme(),'home-dawn');
  u.click('new');u.click('confirm-new');assert.equal(u.Audio.getTheme(),'middle');u.nodes.name={value:'새로운 선수'};u.nodes.number={value:'8'};u.submit(false);
  assert.match(u.html(),/2000 · 새로운 선수/);assert.doesNotMatch(u.html(),/2005|갱강/);assert.equal(u.Audio.getTheme(),'middle');assert.deepEqual(u.state(),before);
  u.advanceClock(4000);u.click('growth');u.click('begin',{},false);assert.match(u.html(),/2000년/);assert.doesNotMatch(u.html(),/2005|갱강/);assert.match(u.html(),/club-crest/);assert.equal(u.Audio.getTheme(),'middle');assert.deepEqual(u.state(),before);
- u.click('skip-scene');assert.match(u.html(),/새로운 선수/);u.click('home');assert.equal(u.Audio.getTheme(),'overseas');assert.deepEqual(u.state(),before);assert.match(u.html(),/기존 선수/);
+ u.click('skip-scene');assert.match(u.html(),/새로운 선수/);u.click('home');assert.equal(u.Audio.getTheme(),'home-dawn');assert.deepEqual(u.state(),before);assert.match(u.html(),/기존 선수/);u.click('hub');assert.equal(u.Audio.getTheme(),'overseas');
 });
 test('overseas professionals show a profile in summer but skip it for a winter transfer',()=>{
  for(const startMonth of [1,7]){
